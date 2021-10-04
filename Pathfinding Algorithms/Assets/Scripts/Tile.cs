@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
@@ -19,20 +17,16 @@ public class Tile : MonoBehaviour
         GridPosX = gridPosXIn;
         GridPosY = gridPosYIn;
 
-        if (!Walkable)
-            GetComponent<SpriteRenderer>().color = new Color(0.25f, 0.25f, 0.25f);
+        UpdateColor();
     }
 
-    public int FCost
+    public void SwitchTileType()
     {
-        get
-        {
-            return GCost + HCost;
-        }
+        Walkable = !Walkable;
+        UpdateColor();
     }
 
-    private void Update()
-    {
+    public int FCost => GCost + HCost;
 
-    }
+    private void UpdateColor() { GetComponent<SpriteRenderer>().color = !Walkable ? new Color(0.25f, 0.25f, 0.25f) : Color.white; }
 }
