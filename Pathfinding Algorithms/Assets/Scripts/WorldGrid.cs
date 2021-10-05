@@ -42,7 +42,7 @@ public class WorldGrid : MonoSingleton<WorldGrid>
             }
         }
 
-        _gridWorldSize = TileStorage[_gridSizeX - 1, _gridSizeY - 1].WorldPos;
+        _gridWorldSize = TileStorage[_gridSizeX - 1, _gridSizeY - 1].worldPos;
     }
 
     public List<Tile> GetNeighbourNodes(Tile targetNode)
@@ -64,8 +64,8 @@ public class WorldGrid : MonoSingleton<WorldGrid>
                     continue;
                 }
 
-                var neighbourX = targetNode.GridPosX + x;
-                var neighbourY = targetNode.GridPosY + y;
+                var neighbourX = targetNode.gridPosX + x;
+                var neighbourY = targetNode.gridPosY + y;
 
                 if (neighbourX >= 0 && neighbourX < _gridSizeX && neighbourY >= 0 && neighbourY < _gridSizeY)
                 {

@@ -8,12 +8,13 @@ using UnityEngine.PlayerLoop;
 
 public class Main : MonoSingleton<Main>
 {
-    [HideInInspector] public List<Entity> Entities;
+    public Dictionary<string, Entity> Entities;
 
     private Camera _camera;
 
     private void Start()
     {
+        Entities = new Dictionary<string, Entity>();
         _camera = Camera.main;
 
         WorldGrid.Instance.CreateGrid();
@@ -22,8 +23,8 @@ public class Main : MonoSingleton<Main>
 
     private void Update()
     {
-        float mousePosX = Mathf.Clamp(Input.mousePosition.x, 0, Screen.width);
-        float mousePosY = Mathf.Clamp(Input.mousePosition.y, 0, Screen.height);
+        var mousePosX = Mathf.Clamp(Input.mousePosition.x, 0, Screen.width);
+        var mousePosY = Mathf.Clamp(Input.mousePosition.y, 0, Screen.height);
         var cursorPos = _camera.ScreenToWorldPoint(new Vector3(mousePosX, mousePosY, 0));
 
         var tile = WorldGrid.Instance.WorldToNodePoint(cursorPos);
@@ -36,12 +37,13 @@ public class Main : MonoSingleton<Main>
 
     private void InitializeEntities()
     {
-        var starchaser = Instantiate(Resources.Load("Starchaser", typeof(GameObject)), this.gameObject.transform) as GameObject;
-        if (!(starchaser is null))
-        {
-            var entityComponent = starchaser.GetComponent<Entity>();
-            entityComponent.SpawnEntity();
-            Entities.Add(entityComponent);
-        }
+        Entity.Instantiate("Starchaser", EntityType.Starchaser);
+        Entity.Instantiate("Star", EntityType.Star);
+    }
+
+    public void TestPath()
+    {
+        Entities["Starchaser"].transform.GetComponent<Starchaser>().Path =
+            Pathfinder.FindPath(Entities["Starchaser"].transform.position, Entities["Star"].transform.position);
     }
 }

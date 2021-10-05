@@ -2,30 +2,30 @@
 
 public class Tile : MonoBehaviour
 {
-    [HideInInspector] public int GCost;
-    [HideInInspector] public int HCost;
-    public int GridPosX;
-    public int GridPosY;
-    public bool Walkable;
-    public Vector3 WorldPos;
-    [HideInInspector] public Tile Parent;
+    [HideInInspector] public int gCost;
+    [HideInInspector] public int hCost;
+    public int gridPosX;
+    public int gridPosY;
+    public bool walkable;
+    public Vector3 worldPos;
+    [HideInInspector] public Tile parent;
 
-    public int FCost => GCost + HCost;
+    public int FCost => gCost + hCost;
 
     //Method carries a role of constructor, hence it's positioned above other methods
     public void Initialize(bool walkableIn, Vector3 worldPosIn, int gridPosXIn, int gridPosYIn)
     {
-        Walkable = walkableIn;
-        WorldPos = worldPosIn;
-        GridPosX = gridPosXIn;
-        GridPosY = gridPosYIn;
+        walkable = walkableIn;
+        worldPos = worldPosIn;
+        gridPosX = gridPosXIn;
+        gridPosY = gridPosYIn;
 
         UpdateColor();
     }
 
     private void UpdateColor()
     {
-        GetComponent<SpriteRenderer>().color = !Walkable ? new Color(0.25f, 0.25f, 0.25f) : Color.white;
+        GetComponent<SpriteRenderer>().color = !walkable ? new Color(0.25f, 0.25f, 0.25f) : Color.white;
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public class Tile : MonoBehaviour
         var entitiesList = Main.Instance.Entities;
         foreach (var t in entitiesList)
         {
-            if (t.GridPos == tile)
+            if (t.Value.GridPos == tile)
                 return true;
         }
 
@@ -50,7 +50,7 @@ public class Tile : MonoBehaviour
         if(CheckIfTileIsOccupied(this))
             return;
 
-        Walkable = !Walkable;
+        walkable = !walkable;
         UpdateColor();
     }
 }
