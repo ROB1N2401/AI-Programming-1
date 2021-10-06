@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Build.Reporting;
-using UnityEngine;
+﻿using UnityEngine;
 
 
 public enum EntityType
@@ -14,27 +11,26 @@ public enum EntityType
 
 public class Entity : MonoBehaviour
 {
-    private Tile _gridPos;
+    protected Tile occupiedTile;
     private EntityType _entityType;
 
-    public Tile GridPos { get => _gridPos; set => _gridPos = value; }
+    public Tile OccupiedTile { get => occupiedTile; set => occupiedTile = value; }
     public EntityType Type => _entityType;
 
     /// <summary>
     /// Sets entity's position to selected tile, both on grid and in-world. Doesn't consider tie's type, so be careful
     /// </summary>
     /// <param name="tile"></param>
-    private void SetEntitysPosition(Tile tile)
+    public void SetEntitysPosition(Tile tile)
     {
-        GridPos = tile;
-        this.transform.position = GridPos.transform.position;
+        occupiedTile = tile;
+        this.transform.position = occupiedTile.transform.position;
     }
 
-    private void SpawnEntity(EntityType entityType)
+    public void PlaceEntityOnRandomTile()
     {
         var x = WorldGrid.Instance.GridSizeX - 1;
         var y = WorldGrid.Instance.GridSizeY - 1;
-        _entityType = entityType;
 
         while (true)
         {
@@ -42,7 +38,7 @@ public class Entity : MonoBehaviour
             var j = Random.Range(0, y);
 
             var tile = WorldGrid.Instance.TileStorage[i, j];
-            if (tile.walkable)
+            if (tile.IsWalkable && !Tile.CheckIfTileIsOccupied(tile))
             {
                 SetEntitysPosition(tile);
                 break;
@@ -55,7 +51,8 @@ public class Entity : MonoBehaviour
         if (Instantiate(Resources.Load(resourcePrefabName, typeof(GameObject))) is GameObject go)
         {
             var entityComponent = go.GetComponent<Entity>();
-            entityComponent.SpawnEntity(entityType);
+            entityComponent._entityType = entityType;
+            entityComponent.PlaceEntityOnRandomTile();
             Main.Instance.Entities.Add(resourcePrefabName, entityComponent);
         }
     }

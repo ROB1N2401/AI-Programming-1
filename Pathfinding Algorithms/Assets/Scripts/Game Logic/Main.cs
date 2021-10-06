@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
+﻿using System.Collections.Generic;
 using Support;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 public class Main : MonoSingleton<Main>
 {
@@ -38,12 +34,13 @@ public class Main : MonoSingleton<Main>
     private void InitializeEntities()
     {
         Entity.Instantiate("Starchaser", EntityType.Starchaser);
+        Entity.Instantiate("Spaceship", EntityType.Spaceship);
         Entity.Instantiate("Star", EntityType.Star);
+        Entity.Instantiate("Trading Post", EntityType.TradingPost);
     }
 
-    public void TestPath()
+    public void RunSimulation()
     {
-        Entities["Starchaser"].transform.GetComponent<Starchaser>().Path =
-            Pathfinder.FindPath(Entities["Starchaser"].transform.position, Entities["Star"].transform.position);
+        Entities["Starchaser"].GetComponent<Starchaser>().LaunchStarchaser();
     }
 }

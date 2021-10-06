@@ -6,8 +6,8 @@ public class Pathfinder
     //Calculates the shortest distance between two nodes without taking obstacles into consideration 
     private static int GetDistance(Tile tileA, Tile tileB)
     {
-        var xDistance = Mathf.Abs(tileB.gridPosX - tileA.gridPosX);
-        var yDistance = Mathf.Abs(tileB.gridPosY - tileA.gridPosY);
+        var xDistance = Mathf.Abs(tileB.GridPosX - tileA.GridPosX);
+        var yDistance = Mathf.Abs(tileB.GridPosY - tileA.GridPosY);
         var sum = 10 * xDistance + 10 * yDistance;
 
         return sum;
@@ -62,7 +62,7 @@ public class Pathfinder
 
             foreach (var neighbour in WorldGrid.Instance.GetNeighbourNodes(currentTile))
             {
-                if (!neighbour.walkable || closedSet.Contains(neighbour))
+                if (!neighbour.IsWalkable || closedSet.Contains(neighbour))
                 {
                     continue;
                 }
@@ -83,6 +83,8 @@ public class Pathfinder
             }
         }
 
+        Main.Instance.Entities["Starchaser"].StopAllCoroutines();
+        Debug.LogWarning("path between two tiles could not be found");
         return null;
     }
 }
