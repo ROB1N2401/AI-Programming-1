@@ -8,7 +8,7 @@ public enum EntityType
     Spaceship
 }
 
-public abstract class Entity : MonoBehaviour
+public class Entity : MonoBehaviour
 {
     protected Tile occupiedTile;
 
