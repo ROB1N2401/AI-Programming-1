@@ -6,10 +6,10 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class Starchaser : Entity
 {
-    private readonly int STAMINA = 15;
+    private readonly uint STAMINA = 15;
     private readonly float STEP_PERIOD = 0.25f;
 
-    private int _currentStamina;
+    private uint _currentStamina;
     private bool _hasStar;
     private List<Tile> _path;
     private LineRenderer _lr;
@@ -80,7 +80,10 @@ public class Starchaser : Entity
             {
                 DropStar();
                 Main.Instance.Entities["Star"].PlaceEntityOnRandomTile();
-                _goingTo = EntityType.Star;
+                if (_currentStamina != 0)
+                    _goingTo = EntityType.Star;
+                else 
+                    _goingTo = EntityType.Spaceship; 
             }
             else if (_currentStamina == 0)
             {
@@ -106,12 +109,6 @@ public class Starchaser : Entity
     }
     #endregion
 
-    private void UpdateColor()
-    {
-        var staminaLeft = (float)_currentStamina / STAMINA;
-        transform.gameObject.GetComponent<SpriteRenderer>().color = new Color(1f - staminaLeft, staminaLeft, 0f);
-    }
-
     private void GrabStar()
     {
         _hasStar = true;
@@ -120,6 +117,12 @@ public class Starchaser : Entity
     private void DropStar()
     {
         _hasStar = false;
+    }
+
+    private void UpdateColor()
+    {
+        var staminaLeft = (float)_currentStamina / STAMINA;
+        transform.gameObject.GetComponent<SpriteRenderer>().color = new Color(1f - staminaLeft, staminaLeft, 0f);
     }
 
     private void RestoreStamina()
@@ -146,7 +149,7 @@ public class Starchaser : Entity
 
     private void GetPath(string entityName)
     {
-        _path = Pathfinder.FindPath(transform.position, Main.Instance.Entities[entityName].transform.position);
+        _path = Pathfinder.FindPath(occupiedTile, Main.Instance.Entities[entityName].OccupiedTile);
         DrawPath();
     }
 
@@ -156,8 +159,8 @@ public class Starchaser : Entity
     /// <returns></returns>
     private bool MoveTowardsTarget()
     {
-        Tile nextTile = _path[1];
-        int delta = (Math.Abs(occupiedTile.GridPosX - nextTile.GridPosX)) + (Math.Abs(occupiedTile.GridPosY - nextTile.GridPosY));
+        var nextTile = _path[1];
+        var delta = (Math.Abs(occupiedTile.GridPosX - nextTile.GridPosX)) + (Math.Abs(occupiedTile.GridPosY - nextTile.GridPosY));
         if (delta == 1)
         {
             if (_hasStar)
@@ -171,7 +174,7 @@ public class Starchaser : Entity
             _path.RemoveAt(0);
             DrawPath();
 
-            Tile targetTile = _path[_path.Count - 1];
+            var targetTile = _path[_path.Count - 1];
             if (occupiedTile != targetTile) return false;
 
             _path = null;

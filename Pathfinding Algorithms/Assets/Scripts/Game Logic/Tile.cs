@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
@@ -10,7 +11,6 @@ public class Tile : MonoBehaviour
     private int _gridPosY;
     private bool _isWalkable;
     private Vector3 _worldPos;
-
 
     public bool IsWalkable => _isWalkable;
     public int GridPosX => _gridPosX;
@@ -42,13 +42,8 @@ public class Tile : MonoBehaviour
     public static bool CheckIfTileIsOccupied(Tile tile)
     {
         var entitiesList = Main.Instance.Entities;
-        foreach (var t in entitiesList)
-        {
-            if (t.Value.OccupiedTile == tile)
-                return true;
-        }
 
-        return false;
+        return entitiesList.Any(t => t.Value.OccupiedTile == tile);
     }
 
     public void SwitchTileType()

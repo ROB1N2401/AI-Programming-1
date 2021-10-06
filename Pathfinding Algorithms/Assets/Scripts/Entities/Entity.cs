@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-
 public enum EntityType
 {
     Starchaser,
@@ -9,13 +8,11 @@ public enum EntityType
     Spaceship
 }
 
-public class Entity : MonoBehaviour
+public abstract class Entity : MonoBehaviour
 {
     protected Tile occupiedTile;
-    private EntityType _entityType;
 
     public Tile OccupiedTile { get => occupiedTile; set => occupiedTile = value; }
-    public EntityType Type => _entityType;
 
     /// <summary>
     /// Sets entity's position to selected tile, both on grid and in-world. Doesn't consider tie's type, so be careful
@@ -51,7 +48,6 @@ public class Entity : MonoBehaviour
         if (Instantiate(Resources.Load(resourcePrefabName, typeof(GameObject))) is GameObject go)
         {
             var entityComponent = go.GetComponent<Entity>();
-            entityComponent._entityType = entityType;
             entityComponent.PlaceEntityOnRandomTile();
             Main.Instance.Entities.Add(resourcePrefabName, entityComponent);
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Main : MonoSingleton<Main>
 {
-    public bool simulationIsRunning;
+    [HideInInspector] public bool simulationIsRunning;
     public Dictionary<string, Entity> Entities;
 
     private Camera _camera;

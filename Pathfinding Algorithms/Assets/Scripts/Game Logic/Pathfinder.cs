@@ -3,8 +3,7 @@ using UnityEngine;
 
 public class Pathfinder
 {
-    //Calculates the shortest distance between two nodes without taking obstacles into consideration 
-    private static int GetDistance(Tile tileA, Tile tileB)
+    private static int GetCheapestDistance(Tile tileA, Tile tileB)
     {
         var xDistance = Mathf.Abs(tileB.GridPosX - tileA.GridPosX);
         var yDistance = Mathf.Abs(tileB.GridPosY - tileA.GridPosY);
@@ -30,11 +29,8 @@ public class Pathfinder
         return path;
     }
     
-    public static List<Tile> FindPath(Vector2 startPos, Vector2 targetPos)
+    public static List<Tile> FindPath(Tile startTile, Tile targetTile)
     {
-        var startTile = WorldGrid.Instance.WorldToNodePoint(startPos);
-        var targetTile = WorldGrid.Instance.WorldToNodePoint(targetPos);
-
         var openSet = new List<Tile>();
         var closedSet = new HashSet<Tile>();
 
@@ -62,23 +58,19 @@ public class Pathfinder
 
             foreach (var neighbour in WorldGrid.Instance.GetNeighbourNodes(currentTile))
             {
-                if (!neighbour.IsWalkable || closedSet.Contains(neighbour))
+                if (!neighbour.IsWalkable || closedSet.Contains(neighbour)) continue;
+                
+                var newMovementCostToNeighbour = currentTile.gCost + GetCheapestDistance(currentTile, neighbour);
+
+                if (neighbour.gCost <= newMovementCostToNeighbour && openSet.Contains(neighbour)) continue;
+
+                neighbour.gCost = newMovementCostToNeighbour;
+                neighbour.hCost = GetCheapestDistance(neighbour, targetTile);
+                neighbour.parent = currentTile;
+
+                if(!openSet.Contains(neighbour))
                 {
-                    continue;
-                }
-
-                var newMovementCostToNeighbour = currentTile.gCost + GetDistance(currentTile, neighbour);
-
-                if (neighbour.gCost > newMovementCostToNeighbour || !openSet.Contains(neighbour))
-                {
-                    neighbour.gCost = newMovementCostToNeighbour;
-                    neighbour.hCost = GetDistance(neighbour, targetTile);
-                    neighbour.parent = currentTile;
-
-                    if(!openSet.Contains(neighbour))
-                    {
-                        openSet.Add(neighbour);
-                    }
+                    openSet.Add(neighbour);
                 }
             }
         }

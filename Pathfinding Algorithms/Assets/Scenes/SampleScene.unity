@@ -177,6 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 434521f154dc74c459cc919278617279, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  simulationIsRunning: 0
 --- !u!1 &408849805
 GameObject:
   m_ObjectHideFlags: 0
@@ -246,7 +247,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Run
+  m_Text: 'Run Simulation
 
 '
 --- !u!222 &408849808
