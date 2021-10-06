@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class Main : MonoSingleton<Main>
 {
+    public bool simulationIsRunning;
     public Dictionary<string, Entity> Entities;
 
     private Camera _camera;
 
     private void Start()
     {
+        simulationIsRunning = false;
         Entities = new Dictionary<string, Entity>();
         _camera = Camera.main;
 
@@ -24,11 +26,27 @@ public class Main : MonoSingleton<Main>
         var cursorPos = _camera.ScreenToWorldPoint(new Vector3(mousePosX, mousePosY, 0));
 
         var tile = WorldGrid.Instance.WorldToNodePoint(cursorPos);
-        if(tile == null)
+        if(tile == null || simulationIsRunning)
             return;
 
+        HandleInput(tile);
+    }
+
+    private void HandleInput(Tile tile)
+    {
         if(Input.GetMouseButtonDown(0))
             tile.SwitchTileType();
+
+        if (Tile.CheckIfTileIsOccupied(tile)) return;
+
+        if(Input.GetKeyDown(KeyCode.Q))
+            Entities["Starchaser"].SetEntitysPosition(tile);
+        if(Input.GetKeyDown(KeyCode.W))
+            Entities["Star"].SetEntitysPosition(tile);
+        if(Input.GetKeyDown(KeyCode.E))
+            Entities["Trading Post"].SetEntitysPosition(tile);
+        if(Input.GetKeyDown(KeyCode.R))
+            Entities["Spaceship"].SetEntitysPosition(tile);
     }
 
     private void InitializeEntities()
@@ -41,6 +59,10 @@ public class Main : MonoSingleton<Main>
 
     public void RunSimulation()
     {
+        if (simulationIsRunning)
+            return;
+
+        simulationIsRunning = true;
         Entities["Starchaser"].GetComponent<Starchaser>().LaunchStarchaser();
     }
 }
