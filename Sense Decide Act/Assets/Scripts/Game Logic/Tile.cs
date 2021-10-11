@@ -1,37 +1,39 @@
 ﻿using System.Linq;
 using UnityEngine;
 
+[RequireComponent(typeof(Grass))]
 public class Tile : MonoBehaviour
 {
-    public int gCost;
-    public int hCost;
-    public Tile parent;
+    [HideInInspector] public int gCost;
+    [HideInInspector] public int hCost;
+    [HideInInspector] public Tile parent;
 
     private int _gridPosX;
     private int _gridPosY;
-    private bool _isWalkable;
+    private bool _isAlive;
     private Vector3 _worldPos;
 
-    public bool IsWalkable => _isWalkable;
+    public bool IsAlive => _isAlive;
     public int GridPosX => _gridPosX;
     public int GridPosY => _gridPosY;
     public Vector3 WorldPos => _worldPos;
     public int FCost => gCost + hCost;
 
     //Method carries a role of constructor, hence it's positioned above other methods
-    public void Initialize(bool isWalkable, Vector3 worldPos, int gridPosX, int gridPosY)
+    public void Initialize(bool isAlive, Vector3 worldPos, int gridPosX, int gridPosY)
     {
-        _isWalkable = isWalkable;
+        _isAlive = isAlive;
         _worldPos = worldPos; 
         _gridPosX = gridPosX;
         _gridPosY = gridPosY;
 
+        GetComponent<Grass>().enabled = _isAlive;
         UpdateColor();
     }
 
     private void UpdateColor()
     {
-        GetComponent<SpriteRenderer>().color = !_isWalkable ? new Color(0.25f, 0.25f, 0.25f) : Color.white;
+        GetComponent<SpriteRenderer>().color = !_isAlive ? new Color(0.3f, 0.1f, 0.0f) : Color.green;
     }
 
     /// <summary>
@@ -41,17 +43,8 @@ public class Tile : MonoBehaviour
     /// <returns>true if tile is occupied by a single entity</returns>
     public static bool CheckIfTileIsOccupied(Tile tile)
     {
-        var entitiesList = Main.Instance.Entities;
+        //var entitiesList = Main.Instance.Entities;
 
-        return entitiesList.Any(t => t.Value.OccupiedTile == tile);
-    }
-
-    public void SwitchTileType()
-    {
-        if(CheckIfTileIsOccupied(this))
-            return;
-
-        _isWalkable = !IsWalkable;
-        UpdateColor();
+        return true; //entitiesList.Any(t => t.Value.OccupiedTile == tile);
     }
 }

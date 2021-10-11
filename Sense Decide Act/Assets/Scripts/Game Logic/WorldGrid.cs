@@ -5,7 +5,7 @@ using UnityEngine;
 public class WorldGrid : MonoSingleton<WorldGrid>
 {
     private Tile[,] _tileStorage;
-    private float _blockedTileSpawnChance;
+    private float _grassTileSpawnChance;
     private int _gridSizeX;
     private int _gridSizeY;
     private Vector2 _gridWorldSize;
@@ -17,7 +17,7 @@ public class WorldGrid : MonoSingleton<WorldGrid>
     // Start is called before the first frame update
     private void Start()
     {
-        _blockedTileSpawnChance = 0.4f;
+        _grassTileSpawnChance = 0.4f;
         _gridSizeX = 10;
         _gridSizeY = 10;
     }
@@ -32,15 +32,20 @@ public class WorldGrid : MonoSingleton<WorldGrid>
             {
                 var pos = new Vector3(i * 5, -j * 5);
                 var go = Instantiate(Resources.Load("Tile", typeof(GameObject)), this.gameObject.transform) as GameObject;
-                if (go is null) 
-                    Debug.LogError("Failed to linitialize a tile");
-                else
+                if (go is null)
                 {
-                    go.transform.position = pos;
-                    var tile = go.GetComponent<Tile>();
-                    tile.Initialize((Random.Range(0f, 1f) >= _blockedTileSpawnChance), pos, i, j);
-                    TileStorage[i, j] = tile;
+                    Debug.LogError("Failed to initialize a tile");
+                    return;
                 }
+            
+                go.transform.position = pos;
+                var tile = go.GetComponent<Tile>();
+                var isAlive = Random.Range(0f, 1f) <= _grassTileSpawnChance;
+                if(isAlive)
+                    Main.Instance.GrassTiles.Add(go.GetInstanceID(), go.GetComponent<Grass>());
+
+                tile.Initialize(isAlive, pos, i, j);
+                TileStorage[i, j] = tile;
             }
         }
 

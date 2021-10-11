@@ -35,7 +35,7 @@ public class Entity : MonoBehaviour
             var j = Random.Range(0, y);
 
             var tile = WorldGrid.Instance.TileStorage[i, j];
-            if (tile.IsWalkable && !Tile.CheckIfTileIsOccupied(tile))
+            if (tile.IsAlive && !Tile.CheckIfTileIsOccupied(tile))
             {
                 SetEntitysPosition(tile);
                 break;
@@ -49,7 +49,7 @@ public class Entity : MonoBehaviour
         {
             var entityComponent = go.GetComponent<Entity>();
             entityComponent.PlaceEntityOnRandomTile();
-            Main.Instance.Entities.Add(resourcePrefabName, entityComponent);
+            //Main.Instance.Entities.Add(resourcePrefabName, entityComponent);
         }
     }
 }

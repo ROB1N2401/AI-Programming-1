@@ -79,7 +79,7 @@ public class Starchaser : Entity
             if (MoveTowardsTarget())
             {
                 DropStar();
-                Main.Instance.Entities["Star"].PlaceEntityOnRandomTile();
+                //Main.Instance.Entities["Star"].PlaceEntityOnRandomTile();
                 if (_currentStamina != 0)
                     _goingTo = EntityType.Star;
                 else 
@@ -149,7 +149,7 @@ public class Starchaser : Entity
 
     private void GetPath(string entityName)
     {
-        _path = Pathfinder.FindPath(occupiedTile, Main.Instance.Entities[entityName].OccupiedTile);
+        //_path = Pathfinder.FindPath(occupiedTile, Main.Instance.Entities[entityName].OccupiedTile);
         DrawPath();
     }
 
@@ -167,7 +167,7 @@ public class Starchaser : Entity
             {
                 _currentStamina--;
                 UpdateColor();
-                Main.Instance.Entities["Star"].SetEntitysPosition(nextTile);
+                //Main.Instance.Entities["Star"].SetEntitysPosition(nextTile);
             }
 
             SetEntitysPosition(nextTile);

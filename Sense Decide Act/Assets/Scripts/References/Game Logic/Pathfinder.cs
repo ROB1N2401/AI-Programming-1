@@ -58,7 +58,7 @@ public class Pathfinder
 
             foreach (var neighbour in WorldGrid.Instance.GetNeighbourNodes(currentTile))
             {
-                if (!neighbour.IsWalkable || closedSet.Contains(neighbour)) continue;
+                if (!neighbour.IsAlive || closedSet.Contains(neighbour)) continue;
                 
                 var newMovementCostToNeighbour = currentTile.gCost + GetCheapestDistance(currentTile, neighbour);
 
@@ -75,8 +75,8 @@ public class Pathfinder
             }
         }
 
-        Main.Instance.simulationIsRunning = false;
-        Main.Instance.Entities["Starchaser"].StopAllCoroutines();
+        //Main.Instance.simulationIsRunning = false;
+        //Main.Instance.Entities["Starchaser"].StopAllCoroutines();
         Debug.LogWarning("path between two tiles could not be found");
         return null;
     }
