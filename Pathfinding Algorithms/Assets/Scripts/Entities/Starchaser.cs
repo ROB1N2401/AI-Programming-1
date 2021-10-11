@@ -6,8 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class Starchaser : Entity
 {
-    private readonly uint STAMINA = 15;
-    private readonly float STEP_PERIOD = 0.25f;
+    private const uint STAMINA = 15;
+    private const float STEP_PERIOD = 0.25f;
 
     private uint _currentStamina;
     private bool _hasStar;
