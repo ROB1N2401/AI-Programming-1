@@ -1,39 +1,40 @@
-﻿using System.Linq;
+﻿
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Grass))]
 public class Tile : MonoBehaviour
 {
-    [HideInInspector] public int gCost;
-    [HideInInspector] public int hCost;
-    [HideInInspector] public Tile parent;
-
     private int _gridPosX;
     private int _gridPosY;
-    private bool _isAlive;
     private Vector3 _worldPos;
+    private Grass _grassComponent;
 
-    public bool IsAlive => _isAlive;
     public int GridPosX => _gridPosX;
     public int GridPosY => _gridPosY;
     public Vector3 WorldPos => _worldPos;
-    public int FCost => gCost + hCost;
+
+    private void Awake()
+    {
+        _grassComponent = GetComponent<Grass>();
+        _grassComponent.enabled = false;
+    }
 
     //Method carries a role of constructor, hence it's positioned above other methods
-    public void Initialize(bool isAlive, Vector3 worldPos, int gridPosX, int gridPosY)
+    public void Initialize(bool hasGrass, Vector3 worldPos, int gridPosX, int gridPosY)
     {
-        _isAlive = isAlive;
         _worldPos = worldPos; 
         _gridPosX = gridPosX;
         _gridPosY = gridPosY;
 
-        GetComponent<Grass>().enabled = _isAlive;
+        if (hasGrass)
+            Grass.Instantiate(this);
         UpdateColor();
     }
 
     private void UpdateColor()
     {
-        GetComponent<SpriteRenderer>().color = !_isAlive ? new Color(0.3f, 0.1f, 0.0f) : Color.green;
+        GetComponent<SpriteRenderer>().color = _grassComponent.enabled ? Color.green : new Color(0.3f, 0.1f, 0.0f);
     }
 
     /// <summary>
@@ -53,7 +54,7 @@ public class Tile : MonoBehaviour
 
     public void SwitchTileState()
     {
-        _isAlive = !_isAlive;
+        _grassComponent.enabled = !_grassComponent.enabled;
         UpdateColor();
     }
 }

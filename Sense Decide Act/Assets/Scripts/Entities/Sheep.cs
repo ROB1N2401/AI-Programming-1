@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sheep : Entity
+public class Sheep : Animal
 {
     private void Awake()
     {
-        entityType = EntityType.Sheep;
+        entityType = EntityType.Animal;
+        animalType = AnimalType.Sheep;
+        speed = 20;
     }
 
     // Start is called before the first frame update

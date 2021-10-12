@@ -40,11 +40,8 @@ public class WorldGrid : MonoSingleton<WorldGrid>
             
                 go.transform.position = pos;
                 var tile = go.GetComponent<Tile>();
-                var isAlive = Random.Range(0f, 1f) <= _grassTileSpawnChance;
-                if(isAlive)
-                    Main.Instance.GrassCollection.Add(go.GetInstanceID(), go.GetComponent<Grass>());
-
-                tile.Initialize(isAlive, pos, i, j);
+                var hasGrass = Random.Range(0f, 1f) <= _grassTileSpawnChance;
+                tile.Initialize(hasGrass, pos, i, j);
                 TileStorage[i, j] = tile;
             }
         }
@@ -52,9 +49,9 @@ public class WorldGrid : MonoSingleton<WorldGrid>
         _gridWorldSize = TileStorage[_gridSizeX - 1, _gridSizeY - 1].WorldPos;
     }
 
-    public List<Tile> GetNeighbourNodes(Tile targetNode)
+    public List<Tile> GetNeighbourTiles(Tile targetTile)
     {
-        var neighbourNodes = new List<Tile>();
+        var neighbourTiles = new List<Tile>();
 
         for (var x = -1; x <= 1; x++)
         {
@@ -71,20 +68,20 @@ public class WorldGrid : MonoSingleton<WorldGrid>
                     continue;
                 }
 
-                var neighbourX = targetNode.GridPosX + x;
-                var neighbourY = targetNode.GridPosY + y;
+                var neighbourX = targetTile.GridPosX + x;
+                var neighbourY = targetTile.GridPosY + y;
 
                 if (neighbourX >= 0 && neighbourX < _gridSizeX && neighbourY >= 0 && neighbourY < _gridSizeY)
                 {
-                    neighbourNodes.Add(TileStorage[neighbourX, neighbourY]);
+                    neighbourTiles.Add(TileStorage[neighbourX, neighbourY]);
                 }
             }
         }
 
-        return neighbourNodes;
+        return neighbourTiles;
     }
 
-    public Tile WorldToNodePoint(Vector2 worldPosition)
+    public Tile WorldToTilePoint(Vector2 worldPosition)
     {
         if (worldPosition.x < -2.5f || worldPosition.x > _gridWorldSize.x + 2.5f ||
             worldPosition.y > 2.5f || worldPosition.y < _gridWorldSize.y - 2.5f)

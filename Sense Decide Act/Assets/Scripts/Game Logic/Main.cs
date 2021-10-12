@@ -23,7 +23,7 @@ public class Main : MonoSingleton<Main>
         _decideTimeElapsed = 0.0f;
 
         WorldGrid.Instance.CreateGrid();
-        InitializeEntities();
+        InitializeAnimals();
     }
 
     private void Update()
@@ -60,11 +60,11 @@ public class Main : MonoSingleton<Main>
         _decideTimeElapsed += Time.deltaTime;
     }
 
-    private static void InitializeEntities()
+    private static void InitializeAnimals()
     {
         for (var i = 0; i < 10; i++)
-            Entity.Instantiate("Sheep", EntityType.Sheep);
+            Animal.Instantiate(AnimalType.Sheep);
 
-        Entity.Instantiate("Wolf", EntityType.Wolf);
+        Animal.Instantiate(AnimalType.Wolf);
     }
 }
