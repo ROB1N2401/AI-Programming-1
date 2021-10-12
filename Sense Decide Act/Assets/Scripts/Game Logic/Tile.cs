@@ -43,8 +43,17 @@ public class Tile : MonoBehaviour
     /// <returns>true if tile is occupied by a single entity</returns>
     public static bool CheckIfTileIsOccupied(Tile tile)
     {
-        //var entitiesList = Main.Instance.Entities;
+        var sheepList = Main.Instance.SheepCollection;
+        var wolvesList = Main.Instance.WolvesCollection;
 
-        return true; //entitiesList.Any(t => t.Value.OccupiedTile == tile);
+        return (sheepList.Any(t => t.Value.OccupiedTile == tile) 
+                ||
+                wolvesList.Any(t => t.Value.OccupiedTile == tile));
+    }
+
+    public void SwitchTileState()
+    {
+        _isAlive = !_isAlive;
+        UpdateColor();
     }
 }

@@ -4,11 +4,23 @@ using UnityEngine;
 
 public class Main : MonoSingleton<Main>
 {
-    public Dictionary<int, Grass> GrassTiles;
+    public const float SENSE_UPDATE_PERIOD = 0.25f;
+    public const float DECIDE_UPDATE_PERIOD = 0.4f;
+
+    public Dictionary<int, Grass> GrassCollection;
+    public Dictionary<int, Sheep> SheepCollection;
+    public Dictionary<int, Wolf> WolvesCollection;
+
+    private float _senseTimeElapsed;
+    private float _decideTimeElapsed;
 
     private void Start()
     {
-        GrassTiles = new Dictionary<int, Grass>();
+        GrassCollection = new Dictionary<int, Grass>();
+        SheepCollection = new Dictionary<int, Sheep>();
+        WolvesCollection = new Dictionary<int, Wolf>();
+        _senseTimeElapsed = 0.0f;
+        _decideTimeElapsed = 0.0f;
 
         WorldGrid.Instance.CreateGrid();
         InitializeEntities();
@@ -16,11 +28,43 @@ public class Main : MonoSingleton<Main>
 
     private void Update()
     {
+        if (_senseTimeElapsed >= SENSE_UPDATE_PERIOD)
+        {
+            _senseTimeElapsed = 0.0f;
 
+            foreach (var e in GrassCollection)
+                e.Value.Sense();
+            
+            foreach (var e in SheepCollection)
+                e.Value.Sense();
+
+            foreach (var e in WolvesCollection)
+                e.Value.Sense();
+        }
+
+        if (_decideTimeElapsed >= DECIDE_UPDATE_PERIOD)
+        {
+            _decideTimeElapsed = 0.0f;
+
+            foreach (var e in GrassCollection)
+                e.Value.Decide();
+            
+            foreach (var e in SheepCollection)
+                e.Value.Decide();
+
+            foreach (var e in WolvesCollection)
+                e.Value.Decide();
+        }
+
+        _senseTimeElapsed += Time.deltaTime;
+        _decideTimeElapsed += Time.deltaTime;
     }
 
-    private void InitializeEntities()
+    private static void InitializeEntities()
     {
- 
+        for (var i = 0; i < 10; i++)
+            Entity.Instantiate("Sheep", EntityType.Sheep);
+
+        Entity.Instantiate("Wolf", EntityType.Wolf);
     }
 }

@@ -42,7 +42,7 @@ public class WorldGrid : MonoSingleton<WorldGrid>
                 var tile = go.GetComponent<Tile>();
                 var isAlive = Random.Range(0f, 1f) <= _grassTileSpawnChance;
                 if(isAlive)
-                    Main.Instance.GrassTiles.Add(go.GetInstanceID(), go.GetComponent<Grass>());
+                    Main.Instance.GrassCollection.Add(go.GetInstanceID(), go.GetComponent<Grass>());
 
                 tile.Initialize(isAlive, pos, i, j);
                 TileStorage[i, j] = tile;
