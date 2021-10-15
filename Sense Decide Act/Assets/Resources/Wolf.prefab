@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 2367260475304250429}
   - component: {fileID: 1000901586725786901}
   m_Layer: 0
-  m_Name: Square
+  m_Name: Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -39,6 +39,7 @@ public class WorldGrid : MonoSingleton<WorldGrid>
                 }
             
                 go.transform.position = pos;
+                go.name = $"Tile [{i}] [{j}]";
                 var tile = go.GetComponent<Tile>();
                 var hasGrass = Random.Range(0f, 1f) <= _grassTileSpawnChance;
                 tile.Initialize(hasGrass, pos, i, j);
@@ -58,12 +59,6 @@ public class WorldGrid : MonoSingleton<WorldGrid>
             for (var y = -1; y <= 1; y++)
             {
                 if (x == 0 && y == 0)
-                {
-                    continue;
-                }
-
-                //This excludes diagonal movement inside the grid
-                if (Mathf.Abs(x) == 1 && Mathf.Abs(y) == 1)
                 {
                     continue;
                 }

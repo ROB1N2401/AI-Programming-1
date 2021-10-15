@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class Wolf : Animal
 {
+    public const int WOLF_MAX_HEALTH = 150;
+
     private void Awake()
     {
         entityType = EntityType.Animal;
+        currentHealth = WOLF_MAX_HEALTH;
         animalType = AnimalType.Wolf;
         speed = 30;
+        healthColor = transform.GetChild(0).GetComponent<SpriteRenderer>().color;
     }
 
     // Start is called before the first frame update

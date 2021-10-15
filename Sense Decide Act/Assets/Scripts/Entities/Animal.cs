@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public enum AnimalType
@@ -10,6 +11,7 @@ public abstract class Animal : Entity
 {
     protected AnimalType animalType;
     protected int speed;
+    protected Color healthColor;
 
     private void SetAnimalsPosition(Tile tile)
     {
@@ -29,7 +31,7 @@ public abstract class Animal : Entity
 
             var tile = WorldGrid.Instance.TileStorage[i, j];
 
-            if (Tile.CheckIfTileIsOccupied(tile)) continue;
+            if (Tile.CheckIfTileIsOccupiedByAnimal(tile)) continue;
 
             SetAnimalsPosition(tile);
             break;
@@ -41,11 +43,18 @@ public abstract class Animal : Entity
         Vector3.MoveTowards(this.transform.position, entity.OccupiedTile.WorldPos, speed * Time.deltaTime);
     }
 
-    //TODO: finish method
+    protected override void UpdateHealthColor(int maxHealth)
+    {
+        var healthLeft = currentHealth / maxHealth;
+        healthColor = new Color(1f - healthLeft, healthLeft, 0f);
+    }
+
     protected void Breed(int maxHealth)
     {
         currentHealth -= (maxHealth / 2.0f);
-        Instantiate(animalType);
+        var newAnimal = Instantiate(animalType);
+        newAnimal.SetAnimalsPosition(GetNearestFreeTile());
+        newAnimal.currentHealth = maxHealth / 2.0f;
     }
 
     protected override void Die()
@@ -62,16 +71,16 @@ public abstract class Animal : Entity
         Destroy(this.gameObject);
     }
 
-    public static void Instantiate(AnimalType animalType)
+    public static Animal Instantiate(AnimalType animalTypeIn)
     {
-        if (!(Instantiate(Resources.Load(animalType.ToString(), typeof(GameObject))) is GameObject go))
+        if (!(Instantiate(Resources.Load(animalTypeIn.ToString(), typeof(GameObject))) is GameObject go))
         {
-            Debug.LogError($"Failed to instantiate animal: {animalType.ToString()}");
-            return;
+            Debug.LogError($"Failed to instantiate animal: {animalTypeIn.ToString()}");
+            return null;
         }
 
         var animalComponent = go.GetComponent<Animal>();
-        switch (animalType)
+        switch (animalTypeIn)
         {
             case AnimalType.Sheep:
                 Main.Instance.SheepCollection.Add(animalComponent.gameObject.GetInstanceID(), animalComponent.GetComponent<Sheep>());
@@ -82,5 +91,6 @@ public abstract class Animal : Entity
         }
 
         animalComponent.PlaceAnimalOnRandomTile();
+        return animalComponent;
     }
 }

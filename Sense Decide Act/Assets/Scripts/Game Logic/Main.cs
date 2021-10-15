@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Main : MonoSingleton<Main>
 {
-    public const float SENSE_UPDATE_PERIOD = 0.25f;
-    public const float DECIDE_UPDATE_PERIOD = 0.4f;
+    public const float SENSE_UPDATE_PERIOD = 0.4f;
+    public const float DECIDE_UPDATE_PERIOD = 0.5f;
 
     public Dictionary<int, Grass> GrassCollection;
     public Dictionary<int, Sheep> SheepCollection;
