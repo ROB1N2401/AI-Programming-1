@@ -6,8 +6,9 @@ public class WorldGrid : MonoSingleton<WorldGrid>
 {
     public const int WORLD_STEP = 5; //distance between each tile in world coordinate units
 
+    private const float GRASS_SPAWN_CHANCE = 0.8f;
+
     private Tile[,] _tileStorage;
-    private float _grassTileSpawnChance;
     private int _gridSizeX;
     private int _gridSizeY;
     private Vector2 _gridWorldSize;
@@ -19,7 +20,6 @@ public class WorldGrid : MonoSingleton<WorldGrid>
     // Start is called before the first frame update
     private void Start()
     {
-        _grassTileSpawnChance = 0.4f;
         _gridSizeX = 10;
         _gridSizeY = 10;
     }
@@ -43,7 +43,7 @@ public class WorldGrid : MonoSingleton<WorldGrid>
                 go.transform.position = pos;
                 go.name = $"Tile [{i}] [{j}]";
                 var tile = go.GetComponent<Tile>();
-                var hasGrass = Random.Range(0f, 1f) <= _grassTileSpawnChance;
+                var hasGrass = Random.Range(0f, 1f) <= GRASS_SPAWN_CHANCE;
                 tile.Initialize(hasGrass, pos, i, j);
                 TileStorage[i, j] = tile;
             }

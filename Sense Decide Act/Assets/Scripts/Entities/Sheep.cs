@@ -6,37 +6,37 @@ using Random = UnityEngine.Random;
 public class Sheep : Animal
 {
     public const int SHEEP_MAX_HEALTH = 90;
-    public const int SHEEP_EATING_RATE = 30;
+
+    private const int SHEEP_EATING_RATE = Grass.GRASS_MAX_HEALTH / 1;
+    private const int SHEEP_WALKING_SPEED = 10;
+    private const int SHEEP_RUNNING_SPEED = SHEEP_WALKING_SPEED * 2;
+    private const int SHEEP_HEALTH_DEPLETION_RATE = SHEEP_MAX_HEALTH / 15;
+
     private Grass _grassToEat;
     private Vector2 _evadeDirection;
     private List<Wolf> _hungryWolvesSeen;
-    private List<Grass> _observableGrass;
+    private List<Grass> _grassSeen;
 
     private void Awake()
     {
-        entityType = EntityType.Sheep;
-        currentHealth = SHEEP_MAX_HEALTH * Random.Range(MIN_STARTING_HEALTH_COEFFICIENT, MAX_STARTING_HEALTH_COEFFICIENT);
-        isHungry = false;
-        isReadyToBreed = false;
-        speed = 10;
         stateSprite = transform.GetComponent<SpriteRenderer>();
         healthSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
-        state = AnimalState.Wandering;
-        _hungryWolvesSeen = new List<Wolf>();
-        _grassToEat = null;
-        _evadeDirection = Vector2.zero;
-    }
 
-    private void Start()
-    {
-        tileToWander = WorldGrid.Instance.GetRandomTile();
-        Decide();
+        isHungry = false;
+        isReadyToBreed = false;
+        entityType = EntityType.Sheep;
+        currentHealth = SHEEP_MAX_HEALTH * Random.Range(MIN_STARTING_HEALTH_COEFFICIENT, MAX_STARTING_HEALTH_COEFFICIENT);
+
+        _grassToEat = null;
+        _grassSeen = new List<Grass>();
+        _hungryWolvesSeen = new List<Wolf>();
+        _evadeDirection = Vector2.zero;
     }
 
     public override void Sense()
     {
         _hungryWolvesSeen = GetHungryWolvesInRadius(3);
-        _observableGrass = GetGrassInRadius(2);
+        _grassSeen = GetGrassInRadius(2);
     }
 
     public override void Decide()
@@ -72,11 +72,10 @@ public class Sheep : Animal
     }
 
     #region FSM
-    // Update is called once per frame
     void Update()
     {
         occupiedTile = WorldGrid.Instance.WorldToTilePoint(transform.position);
-        currentHealth -= HEALTH_DEPLETION_RATE * Time.deltaTime;
+        currentHealth -= SHEEP_HEALTH_DEPLETION_RATE * Time.deltaTime;
         currentHealth = Mathf.Clamp(currentHealth, 0, SHEEP_MAX_HEALTH);
         UpdateHealthColor(SHEEP_MAX_HEALTH);
         ClampPosition();
@@ -87,20 +86,20 @@ public class Sheep : Animal
         switch (state)
         {
             case AnimalState.Evading:
-                transform.Translate(_evadeDirection * (speed * Time.deltaTime));
+                transform.Translate(_evadeDirection * (SHEEP_RUNNING_SPEED * Time.deltaTime));
                 break;
             case AnimalState.Eating:
-                Eat(occupiedTile.GrassComponent, SHEEP_EATING_RATE);
+                Eat(occupiedTile.GrassComponent, SHEEP_EATING_RATE, SHEEP_WALKING_SPEED);
                 break;
             case AnimalState.Breeding:
                 Breed(SHEEP_MAX_HEALTH);
                 Decide();
                 break;
             case AnimalState.Pursuing:
-                MoveTowards(_grassToEat);
+                MoveTowards(_grassToEat, SHEEP_WALKING_SPEED);
                 break;
             case AnimalState.Wandering:
-                MoveTowards(tileToWander);
+                MoveTowards(tileToWander, SHEEP_WALKING_SPEED);
                 break;
         }
     }
@@ -124,8 +123,8 @@ public class Sheep : Animal
 
     private Grass GetGrassToEat()
     {
-        _observableGrass = GetGrassInRadius(2);
-        return _observableGrass.Count == 0 ? null : _observableGrass[Random.Range(0, _observableGrass.Count)];
+        _grassSeen = GetGrassInRadius(2);
+        return _grassSeen.Count == 0 ? null : _grassSeen[Random.Range(0, _grassSeen.Count)];
     }
 
     private List<Wolf> GetHungryWolvesInRadius(ushort tileRadius)

@@ -5,30 +5,27 @@ using UnityEngine;
 public class Wolf : Animal
 {
     public const int WOLF_MAX_HEALTH = 150;
-    public const int WOLF_EATING_RATE = 50;
+
+    private const int WOLF_EATING_RATE = Sheep.SHEEP_MAX_HEALTH / 2;
+    private const int WOLF_WALKING_SPEED = 15;
+    private const int WOLF_RUNNING_SPEED = WOLF_WALKING_SPEED * 2;
+    private const int WOLF_HEALTH_DEPLETION_RATE = WOLF_MAX_HEALTH / 20;
 
     private Sheep _targetedSheep;
     private List<Sheep> _sheepSeen;
 
     private void Awake()
     {
-        entityType = EntityType.Wolf;
-        currentHealth = WOLF_MAX_HEALTH * Random.Range(MIN_STARTING_HEALTH_COEFFICIENT, MAX_STARTING_HEALTH_COEFFICIENT);
-        isHungry = false;
-        isReadyToBreed = false;
-        state = AnimalState.Wandering;
-        _sheepSeen = new List<Sheep>();
-        _targetedSheep = null;
-        speed = 20;
-        tileToWander = null;
         stateSprite = transform.GetComponent<SpriteRenderer>();
         healthSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
-    }
 
-    void Start()
-    {
-        tileToWander = WorldGrid.Instance.GetRandomTile();
-        Decide();
+        isHungry = false;
+        isReadyToBreed = false;
+        entityType = EntityType.Wolf;
+        currentHealth = WOLF_MAX_HEALTH * Random.Range(MIN_STARTING_HEALTH_COEFFICIENT, MAX_STARTING_HEALTH_COEFFICIENT);
+
+        _sheepSeen = new List<Sheep>();
+        _targetedSheep = null;
     }
 
     public override void Sense()
@@ -54,7 +51,7 @@ public class Wolf : Animal
 
         else if (isHungry)
         {
-            _targetedSheep = GetSheepToPursue();
+            _targetedSheep = GetRandomSheepToPursue();
             state = _targetedSheep != null ? AnimalState.Pursuing : AnimalState.Wandering;
         }
 
@@ -69,7 +66,7 @@ public class Wolf : Animal
     void Update()
     {
         occupiedTile = WorldGrid.Instance.WorldToTilePoint(transform.position);
-        currentHealth -= HEALTH_DEPLETION_RATE * Time.deltaTime;
+        currentHealth -= WOLF_HEALTH_DEPLETION_RATE * Time.deltaTime;
         currentHealth = Mathf.Clamp(currentHealth, 0, WOLF_MAX_HEALTH);
         UpdateHealthColor(WOLF_MAX_HEALTH);
         ClampPosition();
@@ -80,17 +77,17 @@ public class Wolf : Animal
         switch (state)
         {
             case AnimalState.Eating:
-                Eat(_targetedSheep, WOLF_EATING_RATE);
+                Eat(_targetedSheep, WOLF_EATING_RATE, WOLF_RUNNING_SPEED);
                 break;
             case AnimalState.Breeding:
                 Breed(WOLF_MAX_HEALTH);
                 Decide();
                 break;
             case AnimalState.Pursuing:
-                MoveTowards(_targetedSheep);
+                MoveTowards(_targetedSheep, WOLF_RUNNING_SPEED);
                 break;
             case AnimalState.Wandering:
-                MoveTowards(tileToWander);
+                MoveTowards(tileToWander, WOLF_WALKING_SPEED);
                 break;
         }
     }
@@ -111,7 +108,14 @@ public class Wolf : Animal
         return sheepToReturn;
     }
 
-    private Sheep GetSheepToPursue()
+    private Sheep GetRandomSheepToPursue()
+    {
+        _sheepSeen = GetSheepInRadius(2);
+        return _sheepSeen.Count == 0 ? null : _sheepSeen[Random.Range(0, _sheepSeen.Count)];
+
+    }
+
+    private Sheep GetNearestSheepToPursue()
     {
         _sheepSeen = GetSheepInRadius(2);
         if (_sheepSeen.Count == 0)

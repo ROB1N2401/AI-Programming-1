@@ -84,12 +84,12 @@ public class Main : MonoSingleton<Main>
                 Debug.LogError("This method should not have non-animal entity passed in");
                 return null;
             case EntityType.Sheep:
-                Main.Instance.SheepCollection.Add(animalComponent.GetInstanceID(), animalComponent.GetComponent<Sheep>());
-                go.name += Main.Instance.SheepCollection.Count;
+                Instance.SheepCollection.Add(animalComponent.GetInstanceID(), animalComponent.GetComponent<Sheep>());
+                go.name += Instance.SheepCollection.Count;
                 break;
             case EntityType.Wolf:
-                Main.Instance.WolvesCollection.Add(animalComponent.GetInstanceID(), animalComponent.GetComponent<Wolf>());
-                go.name += Main.Instance.WolvesCollection.Count;
+                Instance.WolvesCollection.Add(animalComponent.GetInstanceID(), animalComponent.GetComponent<Wolf>());
+                go.name += Instance.WolvesCollection.Count;
                 break;
         }
 

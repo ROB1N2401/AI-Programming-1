@@ -10,8 +10,8 @@ public enum EntityType
 
 public abstract class Entity : MonoBehaviour
 {
-    protected const float MIN_STARTING_HEALTH_COEFFICIENT = 0.6f;
-    protected const float MAX_STARTING_HEALTH_COEFFICIENT = 0.3f;
+    protected const float MIN_STARTING_HEALTH_COEFFICIENT = 0.3f;
+    protected const float MAX_STARTING_HEALTH_COEFFICIENT = 0.5f;
 
     protected EntityType entityType;
     protected Tile occupiedTile;

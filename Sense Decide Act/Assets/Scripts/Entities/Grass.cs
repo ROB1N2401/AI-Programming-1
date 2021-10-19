@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Grass : Entity
 {
-    public enum State
+    private enum State
     {
         Growing, 
         Withering,
@@ -13,8 +13,9 @@ public class Grass : Entity
     public const int GRASS_MAX_HEALTH = 30;
 
     private const float MATURITY_TIME_SPAN = 5.0f; //in seconds
-    private const int SPREADING_CHANCE = 50; //chance to spawn a grass tile each second
-    private const int HEALTH_DEPLETION_RATE = 3;
+    private const int SPREADING_CHANCE = 30; //chance to spawn a grass tile each second
+    private const int GRASS_HEALTH_DEPLETION_RATE = GRASS_MAX_HEALTH / 10;
+
 
     private SpriteRenderer _spriteRenderer;
     private State _state;
@@ -100,12 +101,12 @@ public class Grass : Entity
     
     private void Grow()
     {
-        currentHealth += HEALTH_DEPLETION_RATE * Time.deltaTime;
+        currentHealth += GRASS_HEALTH_DEPLETION_RATE * Time.deltaTime;
     }
 
     private void Wither()
     {
-        currentHealth -= HEALTH_DEPLETION_RATE * Time.deltaTime;
+        currentHealth -= GRASS_HEALTH_DEPLETION_RATE * Time.deltaTime;
     }
 
     private void Spread()
