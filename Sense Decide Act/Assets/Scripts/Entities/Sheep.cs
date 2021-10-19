@@ -5,23 +5,12 @@ using Random = UnityEngine.Random;
 
 public class Sheep : Animal
 {
-    public enum State
-    {
-        Evading,
-        Eating,
-        Breeding,
-        Finding,
-        Wandering
-    }
-
     public const int SHEEP_MAX_HEALTH = 90;
     public const int SHEEP_EATING_RATE = 30;
-
-    private State _state;
-    private Grass _nearestGrass;
+    private Grass _grassToEat;
     private Vector2 _evadeDirection;
-
-    public State StateProperty => _state;
+    private List<Wolf> _hungryWolvesSeen;
+    private List<Grass> _observableGrass;
 
     private void Awake()
     {
@@ -32,44 +21,52 @@ public class Sheep : Animal
         speed = 10;
         stateSprite = transform.GetComponent<SpriteRenderer>();
         healthSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
-        _state = State.Wandering;
-        _nearestGrass = null;
+        state = AnimalState.Wandering;
+        _hungryWolvesSeen = new List<Wolf>();
+        _grassToEat = null;
         _evadeDirection = Vector2.zero;
     }
 
     private void Start()
     {
         tileToWander = WorldGrid.Instance.GetRandomTile();
+        Decide();
     }
 
     public override void Sense()
     {
-        _evadeDirection = GetDirectionToRun(3);
-        _nearestGrass = GetNearestGrass(2);
+        _hungryWolvesSeen = GetHungryWolvesInRadius(3);
+        _observableGrass = GetGrassInRadius(2);
     }
 
     public override void Decide()
     {
         isReadyToBreed = (currentHealth > SHEEP_MAX_HEALTH * BREEDING_COEFFICIENT);
         isHungry = (currentHealth < SHEEP_MAX_HEALTH * HUNGER_COEFFICIENT);
+        if (occupiedTile == tileToWander)
+            tileToWander = WorldGrid.Instance.GetRandomTile();
 
-        if (_evadeDirection != Vector2.zero)
-            _state = State.Evading;
+        if (_hungryWolvesSeen.Count > 0)
+        {
+            _evadeDirection = GetDirectionToRun();
+            state = AnimalState.Evading;
+        }
+
+        else if (_grassToEat != null && occupiedTile == _grassToEat.OccupiedTile && _grassToEat.enabled)
+            state = AnimalState.Eating;
 
         else if (isReadyToBreed)
-            _state = State.Breeding;
+            state = AnimalState.Breeding;
 
-        else if (_nearestGrass == occupiedTile.GrassComponent)
-            _state = State.Eating;
-
-        else if (isHungry && _nearestGrass != null)
-            _state = State.Finding;
+        else if (isHungry)
+        {
+            _grassToEat = GetGrassToEat();
+            state = _grassToEat != null ? AnimalState.Pursuing : AnimalState.Wandering;
+        }
 
         else
-        {
-            tileToWander = WorldGrid.Instance.GetRandomTile();
-            _state = State.Wandering;
-        }
+            state = AnimalState.Wandering;
+        
 
         UpdateStateColor();
     }
@@ -82,103 +79,84 @@ public class Sheep : Animal
         currentHealth -= HEALTH_DEPLETION_RATE * Time.deltaTime;
         currentHealth = Mathf.Clamp(currentHealth, 0, SHEEP_MAX_HEALTH);
         UpdateHealthColor(SHEEP_MAX_HEALTH);
+        ClampPosition();
 
         if (currentHealth == 0)
             Die();
 
-        switch (_state)
+        switch (state)
         {
-            case State.Evading:
+            case AnimalState.Evading:
                 transform.Translate(_evadeDirection * (speed * Time.deltaTime));
                 break;
-            case State.Eating:
+            case AnimalState.Eating:
                 Eat(occupiedTile.GrassComponent, SHEEP_EATING_RATE);
                 break;
-            case State.Breeding:
+            case AnimalState.Breeding:
                 Breed(SHEEP_MAX_HEALTH);
                 Decide();
                 break;
-            case State.Finding:
-                MoveTowards(_nearestGrass);
+            case AnimalState.Pursuing:
+                MoveTowards(_grassToEat);
                 break;
-            case State.Wandering:
+            case AnimalState.Wandering:
                 MoveTowards(tileToWander);
                 break;
         }
     }
     #endregion
 
-    private Grass GetNearestGrass(ushort tileRadius)
+    private List<Grass> GetGrassInRadius(ushort tileRadius)
     {
-        if (occupiedTile.GrassComponent.enabled)
-            return occupiedTile.GrassComponent;
-
-        Grass grassToReturn = null;
-        var shortestDistance = 10000.0f;
+        var grassToReturn = new List<Grass>();
 
         foreach (var grass in Main.Instance.GrassCollection)
         {
             var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - grass.Value.transform.position));
 
-            if (distance > shortestDistance || tileRadius * WorldGrid.WORLD_STEP < distance) continue;
+            if (tileRadius * WorldGrid.WORLD_STEP < distance) continue;
 
-            shortestDistance = distance;
-            grassToReturn = grass.Value;
+            grassToReturn.Add(grass.Value);
         }
+
         return grassToReturn;
     }
 
-    /// <param name="tileRadius">radius in which a sheep can sense wolves</param>
-    /// <returns>a normalized vector that is sum of all wolves' positions</returns>
-    private Vector2 GetDirectionToRun(ushort tileRadius)
+    private Grass GetGrassToEat()
+    {
+        _observableGrass = GetGrassInRadius(2);
+        return _observableGrass.Count == 0 ? null : _observableGrass[Random.Range(0, _observableGrass.Count)];
+    }
+
+    private List<Wolf> GetHungryWolvesInRadius(ushort tileRadius)
     {
         var wolvesNearby = new List<Wolf>();
 
         foreach (var wolf in Main.Instance.WolvesCollection)
         {
             var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - wolf.Value.transform.position));
-
-            if (tileRadius * WorldGrid.WORLD_STEP < distance) continue;
+            if (tileRadius * WorldGrid.WORLD_STEP < distance || !wolf.Value.Ishungry) continue;
 
             wolvesNearby.Add(wolf.Value);
         }
 
-        if(wolvesNearby.Count == 0)
+        return wolvesNearby;
+    }
+
+    /// <returns>a normalized vector that is sum of all wolves' positions</returns>
+    private Vector2 GetDirectionToRun()
+    {
+        _hungryWolvesSeen = GetHungryWolvesInRadius(3);
+        if(_hungryWolvesSeen.Count == 0)
             return Vector2.zero;
 
         var vectorToReturn = Vector3.zero;
-        foreach (var wolf in wolvesNearby)
+        foreach (var wolf in _hungryWolvesSeen)
         {
             var vector = this.transform.position - wolf.transform.position;
             vectorToReturn += vector;
         }
 
         return vectorToReturn.normalized;
-    }
-
-    protected override void UpdateStateColor()
-    {
-        switch (_state)
-        {
-            case State.Evading:
-                stateSprite.color = Color.yellow;
-                break;
-
-            case State.Eating:
-                stateSprite.color = Color.cyan;
-                break;
-
-            case State.Breeding:
-                stateSprite.color = ColorLibrary.pink;
-                break;
-
-            case State.Finding:
-                stateSprite.color = ColorLibrary.orange;
-                break;
-
-            case State.Wandering:
-                stateSprite.color = Color.white;
-                break;
-        }
     }
 }

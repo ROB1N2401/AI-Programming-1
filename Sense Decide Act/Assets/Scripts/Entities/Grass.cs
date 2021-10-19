@@ -13,7 +13,7 @@ public class Grass : Entity
     public const int GRASS_MAX_HEALTH = 30;
 
     private const float MATURITY_TIME_SPAN = 5.0f; //in seconds
-    private const int SPREADING_CHANCE = 30; //in percents, per second
+    private const int SPREADING_CHANCE = 50; //chance to spawn a grass tile each second
     private const int HEALTH_DEPLETION_RATE = 3;
 
     private SpriteRenderer _spriteRenderer;
@@ -127,7 +127,7 @@ public class Grass : Entity
         {
             if (sheep.Value.OccupiedTile != this.OccupiedTile) continue;
 
-            if (sheep.Value.StateProperty == Sheep.State.Eating)
+            if (sheep.Value.State == AnimalState.Eating)
                 return true;
         }
 
