@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class WorldGrid : MonoSingleton<WorldGrid>
 {
+    public const int WORLD_STEP = 5; //distance between each tile in world coordinate units
+
     private Tile[,] _tileStorage;
     private float _grassTileSpawnChance;
     private int _gridSizeX;
@@ -30,7 +32,7 @@ public class WorldGrid : MonoSingleton<WorldGrid>
         {
             for (var j = 0; j < _gridSizeY; j++)
             {
-                var pos = new Vector3(i * 5, -j * 5);
+                var pos = new Vector3(i * WORLD_STEP, -j * WORLD_STEP);
                 var go = Instantiate(Resources.Load("Tile", typeof(GameObject)), this.gameObject.transform) as GameObject;
                 if (go is null)
                 {
@@ -50,13 +52,13 @@ public class WorldGrid : MonoSingleton<WorldGrid>
         _gridWorldSize = TileStorage[_gridSizeX - 1, _gridSizeY - 1].WorldPos;
     }
 
-    public List<Tile> GetNeighbourTiles(Tile targetTile)
+    public List<Tile> GetNeighbourTiles(Tile targetTile, ushort radius)
     {
         var neighbourTiles = new List<Tile>();
 
-        for (var x = -1; x <= 1; x++)
+        for (var x = -radius; x <= radius; x++)
         {
-            for (var y = -1; y <= 1; y++)
+            for (var y = -radius; y <= radius; y++)
             {
                 if (x == 0 && y == 0)
                 {
@@ -78,10 +80,6 @@ public class WorldGrid : MonoSingleton<WorldGrid>
 
     public Tile WorldToTilePoint(Vector2 worldPosition)
     {
-        if (worldPosition.x < -2.5f || worldPosition.x > _gridWorldSize.x + 2.5f ||
-            worldPosition.y > 2.5f || worldPosition.y < _gridWorldSize.y - 2.5f)
-            return null;
-
         var percentX = worldPosition.x / _gridWorldSize.x;
         var percentY = worldPosition.y / _gridWorldSize.y;
 
@@ -91,6 +89,14 @@ public class WorldGrid : MonoSingleton<WorldGrid>
         var x = Mathf.RoundToInt((_gridSizeX - 1) * percentX);
         var y = Mathf.RoundToInt((_gridSizeY - 1) * percentY);
 
-        return TileStorage[x, y];
+        return _tileStorage[x, y];
+    }
+
+    public Tile GetRandomTile()
+    {
+        var x = Random.Range(0, _gridSizeX);
+        var y = Random.Range(0, _gridSizeY);
+
+        return _tileStorage[x, y];
     }
 }

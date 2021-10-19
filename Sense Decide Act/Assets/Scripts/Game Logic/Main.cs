@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Support;
 using UnityEngine;
 
 public class Main : MonoSingleton<Main>
 {
-    public const float SENSE_UPDATE_PERIOD = 0.4f;
-    public const float DECIDE_UPDATE_PERIOD = 0.5f;
+    public const float SENSE_UPDATE_PERIOD = 0.1f;
+    public const float DECIDE_UPDATE_PERIOD = 0.4f;
 
     public Dictionary<int, Grass> GrassCollection;
     public Dictionary<int, Sheep> SheepCollection;
@@ -63,8 +63,37 @@ public class Main : MonoSingleton<Main>
     private static void InitializeAnimals()
     {
         for (var i = 0; i < 10; i++)
-            Animal.Instantiate(AnimalType.Sheep);
+            Instantiate(EntityType.Sheep);
 
-        Animal.Instantiate(AnimalType.Wolf);
+        Instantiate(EntityType.Wolf);
+    }
+
+    public static Animal Instantiate(EntityType entityTypeIn)
+    {
+        if (!(Instantiate(Resources.Load(entityTypeIn.ToString(), typeof(GameObject))) is GameObject go))
+        {
+            Debug.LogError($"Failed to instantiate animal: {entityTypeIn.ToString()}");
+            return null;
+        }
+
+        go.name = entityTypeIn + " ";
+        var animalComponent = go.GetComponent<Animal>();
+        switch (entityTypeIn)
+        {
+            case EntityType.Grass:
+                Debug.LogError("This method should not have non-animal entity passed in");
+                return null;
+            case EntityType.Sheep:
+                Main.Instance.SheepCollection.Add(animalComponent.GetInstanceID(), animalComponent.GetComponent<Sheep>());
+                go.name += Main.Instance.SheepCollection.Count;
+                break;
+            case EntityType.Wolf:
+                Main.Instance.WolvesCollection.Add(animalComponent.GetInstanceID(), animalComponent.GetComponent<Wolf>());
+                go.name += Main.Instance.WolvesCollection.Count;
+                break;
+        }
+
+        animalComponent.PlaceAnimalOnRandomTile();
+        return animalComponent;
     }
 }

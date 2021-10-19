@@ -4,16 +4,21 @@ using UnityEngine;
 public enum EntityType
 {
     Grass,
-    Animal
+    Sheep,
+    Wolf
 }
 
 public abstract class Entity : MonoBehaviour
 {
+    protected const float MIN_STARTING_HEALTH_COEFFICIENT = 0.6f;
+    protected const float MAX_STARTING_HEALTH_COEFFICIENT = 0.3f;
+
     protected EntityType entityType;
     protected Tile occupiedTile;
     [SerializeField] protected float currentHealth;
 
     public Tile OccupiedTile { get => occupiedTile; set => occupiedTile = value; }
+    public float CurrentHealth { get => currentHealth; set => currentHealth = value; }
 
     public abstract void Sense();
     public abstract void Decide();
@@ -21,18 +26,15 @@ public abstract class Entity : MonoBehaviour
     protected abstract void UpdateHealthColor(int maxHealth);
     protected abstract void Die();
 
-    protected Tile GetNearestFreeTile()
+    protected Tile GetNearestFreeTile(Entity entity)
     {
-        var neighbourTiles = WorldGrid.Instance.GetNeighbourTiles(occupiedTile);
+        var neighbourTiles = WorldGrid.Instance.GetNeighbourTiles(occupiedTile, 1);
 
-        switch (entityType)
-        {
-            case EntityType.Animal:
-                return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileIsOccupiedByAnimal(tile));
-                
-            case EntityType.Grass:
-                return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileHasGrass(tile));
-        }
+        if(entity is Sheep || entity is Wolf)
+            return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileIsOccupiedByAnimal(tile));
+
+        if(entity is Grass)
+            return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileHasGrass(tile));
 
         Debug.LogWarning("There is no free tile nearby");
         return null;

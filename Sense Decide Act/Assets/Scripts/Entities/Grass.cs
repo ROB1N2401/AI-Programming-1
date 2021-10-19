@@ -10,12 +10,11 @@ public class Grass : Entity
         Trampled
     }
 
-    private const float MIN_STARTING_HEALTH_COEFFICIENT = 0.1f;
-    private const float MAX_STARTING_HEALTH_COEFFICIENT = 0.2f;
-    private const float MATURITY_TIME_SPAN = 5.0f; //in seconds
-    private const int SPREADING_CHANCE = 15; //in percents, per frame
-    private const int HEALTH_DEPLETION_RATE = 3;
     public const int GRASS_MAX_HEALTH = 30;
+
+    private const float MATURITY_TIME_SPAN = 5.0f; //in seconds
+    private const int SPREADING_CHANCE = 30; //in percents, per second
+    private const int HEALTH_DEPLETION_RATE = 3;
 
     private SpriteRenderer _spriteRenderer;
     private State _state;
@@ -50,40 +49,31 @@ public class Grass : Entity
 
     public override void Sense()
     {
-        _hasReachedMaturity = (_maturityTimeElapsed > 0.0f) || (currentHealth >= GRASS_MAX_HEALTH && _maturityTimeElapsed == 0.0f);
         _isTrampled = Tile.CheckIfTileIsOccupiedByAnimal(this.OccupiedTile);
         _isEaten = CheckIfBeingEaten();
     }
 
     public override void Decide()
     {
+        _hasReachedMaturity = (_maturityTimeElapsed > 0.0f) || (currentHealth >= GRASS_MAX_HEALTH && _maturityTimeElapsed == 0.0f);
+
         if (!_isTrampled && !_hasReachedMaturity)
-        {
             _state = State.Growing;
-            return;
-        }
 
-        if (_maturityTimeElapsed > MATURITY_TIME_SPAN)
-        {
+        else if (_maturityTimeElapsed > MATURITY_TIME_SPAN)
             _state = State.Withering;
-            return;
-        }
 
-        if (_hasReachedMaturity && !_isEaten)
-        {
+        else if (_hasReachedMaturity && !_isEaten) 
             _state = State.Spreading;
-            return;
-        }
 
-        if (_isTrampled)
-        {
+        else if (_isTrampled)
             _state = State.Trampled;
-        }
     }
 
     #region FSM
     private void Update()
     {
+        currentHealth = Mathf.Clamp(currentHealth, 0, GRASS_MAX_HEALTH);
         UpdateHealthColor(GRASS_MAX_HEALTH);
 
         if (currentHealth == 0)
@@ -111,21 +101,19 @@ public class Grass : Entity
     private void Grow()
     {
         currentHealth += HEALTH_DEPLETION_RATE * Time.deltaTime;
-        currentHealth = Mathf.Clamp(currentHealth, 0, GRASS_MAX_HEALTH);
     }
 
     private void Wither()
     {
         currentHealth -= HEALTH_DEPLETION_RATE * Time.deltaTime;
-        currentHealth = Mathf.Clamp(currentHealth, 0, GRASS_MAX_HEALTH);
     }
 
     private void Spread()
     {
         _maturityTimeElapsed += Time.deltaTime;
-        if (!(Random.Range(0.0f, 1.0f) * 100 <= SPREADING_CHANCE / 100.0f)) return;
+        if (!(Random.Range(0.0f, 1.0f) * 100 <= SPREADING_CHANCE * Time.deltaTime)) return;
 
-        var tile = GetNearestFreeTile();
+        var tile = GetNearestFreeTile(this);
         if(tile != null)
             Instantiate(tile);
     }
@@ -167,7 +155,7 @@ public class Grass : Entity
         //Debug.Log($"{tile.name} has ID {tile.GetInstanceID()}, {tile.gameObject.GetInstanceID()}");
 
         tile.SetGrassComponentState(true);
-        if(!Main.Instance.GrassCollection.ContainsKey(tile.GetInstanceID()))
-            Main.Instance.GrassCollection.Add(tile.GetInstanceID(), grass);
+        if(!Main.Instance.GrassCollection.ContainsKey(grass.GetInstanceID()))
+            Main.Instance.GrassCollection.Add(grass.GetInstanceID(), grass);
     }
 }

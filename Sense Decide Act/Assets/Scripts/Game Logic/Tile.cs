@@ -13,6 +13,7 @@ public class Tile : MonoBehaviour
     public int GridPosX => _gridPosX;
     public int GridPosY => _gridPosY;
     public Vector3 WorldPos => _worldPos;
+    public Grass GrassComponent => _grassComponent;
 
     private void Awake()
     {
@@ -54,7 +55,7 @@ public class Tile : MonoBehaviour
 
     public void UpdateColor()
     {
-        GetComponent<SpriteRenderer>().color = _grassComponent.enabled ? Color.green : new Color(0.3f, 0.1f, 0.0f);
+        GetComponent<SpriteRenderer>().color = _grassComponent.enabled ? Color.green : ColorLibrary.brown;
     }
 
     public void SetGrassComponentState(bool value)
