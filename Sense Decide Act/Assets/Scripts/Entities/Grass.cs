@@ -10,7 +10,7 @@ public class Grass : Entity
         Trampled
     }
 
-    public const int GRASS_MAX_HEALTH = 45;
+    public const int GRASS_MAX_HEALTH = 30;
 
     private const float MATURITY_TIME_SPAN = 5.0f; //in seconds
     private const int SPREADING_CHANCE = 30; //chance to spawn a grass tile each second
