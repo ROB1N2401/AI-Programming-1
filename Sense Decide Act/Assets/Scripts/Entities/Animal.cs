@@ -114,22 +114,14 @@ public abstract class Animal : Entity
         float startingHealth = maxHealth * Random.Range(MIN_STARTING_HEALTH_COEFFICIENT, MAX_STARTING_HEALTH_COEFFICIENT);
         currentHealth -= startingHealth;
 
-        var newAnimal = Main.Instantiate(entityType);
+        var newAnimal = (Animal)Main.Instantiate(entityType);
         newAnimal.SetAnimalsPosition(GetNearestFreeTile(this));
         newAnimal.currentHealth = startingHealth;
     }
 
     protected override void Die()
     {
-        switch (entityType)
-        {
-            case EntityType.Sheep:
-                Main.Instance.SheepCollection.Remove(GetInstanceID());
-                break;
-            case EntityType.Wolf:
-                Main.Instance.WolvesCollection.Remove(GetInstanceID());
-                break;
-        }
+        Main.Instance.EntityCollection.Remove(transform.gameObject.GetInstanceID());
         Destroy(gameObject);
     }
 

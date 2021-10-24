@@ -1,5 +1,6 @@
 ﻿
 using System.Linq;
+using System.Net;
 using UnityEngine;
 
 [RequireComponent(typeof(Grass))]
@@ -40,12 +41,12 @@ public class Tile : MonoBehaviour
     /// <returns>true if tile is occupied by a single entity</returns>
     public static bool CheckIfTileIsOccupiedByAnimal(Tile tile)
     {
-        var sheepList = Main.Instance.SheepCollection;
-        var wolvesList = Main.Instance.WolvesCollection;
+        var sheepList = Main.GetEntitiesOfType<Sheep>();
+        var wolvesList = Main.GetEntitiesOfType<Wolf>();
 
-        return (sheepList.Any(t => t.Value.OccupiedTile == tile) 
+        return (sheepList.Any(t => t.OccupiedTile == tile) 
                 ||
-                wolvesList.Any(t => t.Value.OccupiedTile == tile));
+                wolvesList.Any(t => t.OccupiedTile == tile));
     }
 
     public static bool CheckIfTileHasGrass(Tile tile)

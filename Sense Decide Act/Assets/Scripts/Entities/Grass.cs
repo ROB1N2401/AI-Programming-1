@@ -10,7 +10,7 @@ public class Grass : Entity
         Trampled
     }
 
-    public const int GRASS_MAX_HEALTH = 30;
+    public const int GRASS_MAX_HEALTH = 45;
 
     private const float MATURITY_TIME_SPAN = 5.0f; //in seconds
     private const int SPREADING_CHANCE = 30; //chance to spawn a grass tile each second
@@ -122,13 +122,13 @@ public class Grass : Entity
 
     private bool CheckIfBeingEaten()
     {
-        var sheepList = Main.Instance.SheepCollection;
+        var sheepList = Main.GetEntitiesOfType<Sheep>();
 
         foreach (var sheep in sheepList)
         {
-            if (sheep.Value.OccupiedTile != this.OccupiedTile) continue;
+            if (sheep.OccupiedTile != this.OccupiedTile) continue;
 
-            if (sheep.Value.State == AnimalState.Eating)
+            if (sheep.State == AnimalState.Eating)
                 return true;
         }
 
@@ -146,7 +146,7 @@ public class Grass : Entity
     protected override void Die()
     {
         occupiedTile.SetGrassComponentState(false);
-        Main.Instance.GrassCollection.Remove(GetInstanceID());
+        Main.Instance.EntityCollection.Remove(transform.gameObject.GetInstanceID());
     }
 
     public static void Instantiate(Tile tile)
@@ -156,7 +156,7 @@ public class Grass : Entity
         //Debug.Log($"{tile.name} has ID {tile.GetInstanceID()}, {tile.gameObject.GetInstanceID()}");
 
         tile.SetGrassComponentState(true);
-        if(!Main.Instance.GrassCollection.ContainsKey(grass.GetInstanceID()))
-            Main.Instance.GrassCollection.Add(grass.GetInstanceID(), grass);
+        if(!Main.Instance.EntityCollection.ContainsKey(grass.transform.gameObject.GetInstanceID()))
+            Main.Instance.EntityCollection.Add(grass.transform.gameObject.GetInstanceID(), grass);
     }
 }

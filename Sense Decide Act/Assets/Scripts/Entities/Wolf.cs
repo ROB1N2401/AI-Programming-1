@@ -96,13 +96,14 @@ public class Wolf : Animal
     private List<Sheep> GetSheepInRadius(ushort tileRadius)
     {
         var sheepToReturn = new List<Sheep>();
+        var allSheep = Main.GetEntitiesOfType<Sheep>();
 
-        foreach (var sheep in Main.Instance.SheepCollection)
+        foreach (var sheep in allSheep)
         {
-            var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - sheep.Value.transform.position));
+            var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - sheep.transform.position));
 
             if (tileRadius * WorldGrid.WORLD_STEP < distance) continue;
-                sheepToReturn.Add(sheep.Value);
+                sheepToReturn.Add(sheep);
         }
 
         return sheepToReturn;

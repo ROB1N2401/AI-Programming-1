@@ -1,63 +1,45 @@
+using System.Collections;
 using System.Collections.Generic;
 using Support;
 using UnityEngine;
+// ReSharper disable IteratorNeverReturns
 
 public class Main : MonoSingleton<Main>
 {
     public const float SENSE_UPDATE_PERIOD = 0.1f;
     public const float DECIDE_UPDATE_PERIOD = 0.4f;
 
-    public Dictionary<int, Grass> GrassCollection;
-    public Dictionary<int, Sheep> SheepCollection;
-    public Dictionary<int, Wolf> WolvesCollection;
-
-    private float _senseTimeElapsed;
-    private float _decideTimeElapsed;
+    public Dictionary<int, Entity> EntityCollection;
 
     private void Start()
     {
-        GrassCollection = new Dictionary<int, Grass>();
-        SheepCollection = new Dictionary<int, Sheep>();
-        WolvesCollection = new Dictionary<int, Wolf>();
-        _senseTimeElapsed = 0.0f;
-        _decideTimeElapsed = 0.0f;
+        EntityCollection = new Dictionary<int, Entity>();
 
         WorldGrid.Instance.CreateGrid();
         InitializeAnimals();
+
+        StartCoroutine(SenseRoutine());
+        StartCoroutine(DecisionRoutine());
     }
 
-    private void Update()
+    private IEnumerator SenseRoutine()
     {
-        if (_senseTimeElapsed >= SENSE_UPDATE_PERIOD)
+        while (true)
         {
-            _senseTimeElapsed = 0.0f;
-
-            foreach (var e in GrassCollection)
+            foreach (var e in EntityCollection)
                 e.Value.Sense();
-            
-            foreach (var e in SheepCollection)
-                e.Value.Sense();
-
-            foreach (var e in WolvesCollection)
-                e.Value.Sense();
+            yield return new WaitForSeconds(SENSE_UPDATE_PERIOD);
         }
+    }
 
-        if (_decideTimeElapsed >= DECIDE_UPDATE_PERIOD)
+    private IEnumerator DecisionRoutine()
+    {
+        while (true)
         {
-            _decideTimeElapsed = 0.0f;
-
-            foreach (var e in GrassCollection)
+            foreach (var e in EntityCollection)
                 e.Value.Decide();
-            
-            foreach (var e in SheepCollection)
-                e.Value.Decide();
-
-            foreach (var e in WolvesCollection)
-                e.Value.Decide();
+            yield return new WaitForSeconds(DECIDE_UPDATE_PERIOD);
         }
-
-        _senseTimeElapsed += Time.deltaTime;
-        _decideTimeElapsed += Time.deltaTime;
     }
 
     private static void InitializeAnimals()
@@ -68,32 +50,38 @@ public class Main : MonoSingleton<Main>
         Instantiate(EntityType.Wolf);
     }
 
-    public static Animal Instantiate(EntityType entityTypeIn)
+    public static List<T> GetEntitiesOfType<T>()
     {
-        if (!(Instantiate(Resources.Load(entityTypeIn.ToString(), typeof(GameObject))) is GameObject go))
+        var entites = new List<T>();
+
+        foreach (var entity in Instance.EntityCollection)
         {
-            Debug.LogError($"Failed to instantiate animal: {entityTypeIn.ToString()}");
+            if(entity.Value is T t)
+                entites.Add(t);
+        }
+
+        return entites;
+    }
+
+
+    public static Entity Instantiate(EntityType entityTypeIn)
+    {
+        var entityName = entityTypeIn.ToString();
+        if (!(Instantiate(Resources.Load(entityName, typeof(GameObject))) is GameObject go))
+        {
+            Debug.LogError($"Failed to instantiate animal: {entityName}");
             return null;
         }
 
         go.name = entityTypeIn + " ";
-        var animalComponent = go.GetComponent<Animal>();
-        switch (entityTypeIn)
-        {
-            case EntityType.Grass:
-                Debug.LogError("This method should not have non-animal entity passed in");
-                return null;
-            case EntityType.Sheep:
-                Instance.SheepCollection.Add(animalComponent.GetInstanceID(), animalComponent.GetComponent<Sheep>());
-                go.name += Instance.SheepCollection.Count;
-                break;
-            case EntityType.Wolf:
-                Instance.WolvesCollection.Add(animalComponent.GetInstanceID(), animalComponent.GetComponent<Wolf>());
-                go.name += Instance.WolvesCollection.Count;
-                break;
-        }
+        var entityComponent = go.GetComponent<Entity>();
+        Instance.EntityCollection.Add(go.GetInstanceID(), entityComponent);
+
+        if (!(entityComponent is Animal animalComponent)) 
+            return entityComponent;
 
         animalComponent.PlaceAnimalOnRandomTile();
+
         return animalComponent;
     }
 }

@@ -108,14 +108,15 @@ public class Sheep : Animal
     private List<Grass> GetGrassInRadius(ushort tileRadius)
     {
         var grassToReturn = new List<Grass>();
+        var allGrass = Main.GetEntitiesOfType<Grass>();
 
-        foreach (var grass in Main.Instance.GrassCollection)
+        foreach (var grass in allGrass)
         {
-            var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - grass.Value.transform.position));
+            var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - grass.transform.position));
 
             if (tileRadius * WorldGrid.WORLD_STEP < distance) continue;
 
-            grassToReturn.Add(grass.Value);
+            grassToReturn.Add(grass);
         }
 
         return grassToReturn;
@@ -129,14 +130,15 @@ public class Sheep : Animal
 
     private List<Wolf> GetHungryWolvesInRadius(ushort tileRadius)
     {
+        var allWolves = Main.GetEntitiesOfType<Wolf>();
         var wolvesNearby = new List<Wolf>();
 
-        foreach (var wolf in Main.Instance.WolvesCollection)
+        foreach (var wolf in allWolves)
         {
-            var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - wolf.Value.transform.position));
-            if (tileRadius * WorldGrid.WORLD_STEP < distance || !wolf.Value.Ishungry) continue;
+            var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - wolf.transform.position));
+            if (tileRadius * WorldGrid.WORLD_STEP < distance || !wolf.Ishungry) continue;
 
-            wolvesNearby.Add(wolf.Value);
+            wolvesNearby.Add(wolf);
         }
 
         return wolvesNearby;
