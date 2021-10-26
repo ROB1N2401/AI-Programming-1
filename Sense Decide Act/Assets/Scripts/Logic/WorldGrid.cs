@@ -47,13 +47,13 @@ public class WorldGrid : MonoSingleton<WorldGrid>
         _gridWorldSize = TileStorage[GRID_SIZE_X - 1, GRID_SIZE_Y - 1].WorldPos;
     }
 
-    public List<Tile> GetNeighbourTiles(Tile targetTile, ushort radius)
+    public List<Tile> GetNeighbourTiles(Tile targetTile)
     {
         var neighbourTiles = new List<Tile>();
 
-        for (var x = -radius; x <= radius; x++)
+        for (var x = -1; x <= 1; x++)
         {
-            for (var y = -radius; y <= radius; y++)
+            for (var y = -1; y <= 1; y++)
             {
                 if (x == 0 && y == 0)
                 {

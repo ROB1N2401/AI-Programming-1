@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Support;
 using UnityEngine;
-// ReSharper disable IteratorNeverReturns
 
 public class Main : MonoSingleton<Main>
 {

@@ -8,9 +8,10 @@ public class Wolf : Animal
     public const int WOLF_MAX_HEALTH = 150;
 
     private const int WOLF_EATING_RATE = Sheep.SHEEP_MAX_HEALTH / 2;
-    private const int WOLF_WALKING_SPEED = 14;
+    private const int WOLF_WALKING_SPEED = 12;
     private const int WOLF_RUNNING_SPEED = WOLF_WALKING_SPEED * 2;
     private const int WOLF_HEALTH_DEPLETION_RATE = WOLF_MAX_HEALTH / 20;
+    private const int WOLF_SHEEP_DETECTION_RADIUS = 2;
 
     private Sheep _targetedSheep;
     private List<Sheep> _sheepSeen;
@@ -31,7 +32,7 @@ public class Wolf : Animal
 
     public override void Sense()
     {
-        _sheepSeen = GetSheepInRadius(2);
+        _sheepSeen = GetSheepInRadius(WOLF_SHEEP_DETECTION_RADIUS);
     }
 
     public override void Decide()
@@ -124,7 +125,7 @@ public class Wolf : Animal
 
     private Sheep GetRandomSheepToPursue()
     {
-        _sheepSeen = GetSheepInRadius(2);
+        _sheepSeen = GetSheepInRadius(WOLF_SHEEP_DETECTION_RADIUS);
         return _sheepSeen.Count == 0 ? null : _sheepSeen[Random.Range(0, _sheepSeen.Count)];
 
     }

@@ -7,10 +7,12 @@ public class Sheep : Animal
 {
     public const int SHEEP_MAX_HEALTH = 90;
 
-    private const int SHEEP_EATING_RATE = Grass.GRASS_MAX_HEALTH / 1;
-    private const int SHEEP_WALKING_SPEED = 11;
+    private const int SHEEP_EATING_RATE = Grass.GRASS_MAX_HEALTH;
+    private const int SHEEP_WALKING_SPEED = 10;
     private const int SHEEP_RUNNING_SPEED = SHEEP_WALKING_SPEED * 2;
-    private const int SHEEP_HEALTH_DEPLETION_RATE = SHEEP_MAX_HEALTH / 15;
+    private const int SHEEP_HEALTH_DEPLETION_RATE = SHEEP_MAX_HEALTH / 20;
+    private const int SHEEP_GRASS_DETECTION_RADIUS = 2;
+    private const int SHEEP_WOLF_DETECTION_RADIUS = 3;
 
     private Grass _grassToEat;
     private Vector2 _evadeDirection;
@@ -35,8 +37,8 @@ public class Sheep : Animal
 
     public override void Sense()
     {
-        _hungryWolvesSeen = GetHungryWolvesInRadius(3);
-        _grassSeen = GetGrassInRadius(2);
+        _hungryWolvesSeen = GetHungryWolvesInRadius(SHEEP_WOLF_DETECTION_RADIUS);
+        _grassSeen = GetGrassInRadius(SHEEP_GRASS_DETECTION_RADIUS);
     }
 
     public override void Decide()
@@ -133,7 +135,7 @@ public class Sheep : Animal
 
     private Grass GetGrassToEat()
     {
-        _grassSeen = GetGrassInRadius(2);
+        _grassSeen = GetGrassInRadius(SHEEP_GRASS_DETECTION_RADIUS);
         return _grassSeen.Count == 0 ? null : _grassSeen[Random.Range(0, _grassSeen.Count)];
     }
 
@@ -172,7 +174,7 @@ public class Sheep : Animal
     ///<returns>A normalized vector that is sum of all wolves' positions and avoidance vectors</returns>
     private Vector2 GetDirectionToRun()
     {
-        _hungryWolvesSeen = GetHungryWolvesInRadius(3);
+        _hungryWolvesSeen = GetHungryWolvesInRadius(SHEEP_WOLF_DETECTION_RADIUS);
         if(_hungryWolvesSeen.Count == 0)
             return Vector2.zero;
 

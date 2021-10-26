@@ -28,13 +28,13 @@ public abstract class Entity : MonoBehaviour
 
     protected Tile GetNearestFreeTile(Entity entity)
     {
-        var neighbourTiles = WorldGrid.Instance.GetNeighbourTiles(occupiedTile, 1);
+        var neighbourTiles = WorldGrid.Instance.GetNeighbourTiles(occupiedTile);
 
         switch (entity)
         {
             case Sheep _:
             case Wolf _:
-                return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileIsOccupiedByAnimal(tile));
+                return neighbourTiles[Random.Range(0, neighbourTiles.Count)];
             case Grass _:
                 return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileHasGrass(tile));
             default:
