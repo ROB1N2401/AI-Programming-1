@@ -15,7 +15,7 @@ public abstract class Entity : MonoBehaviour
 
     protected EntityType entityType;
     protected Tile occupiedTile;
-    [SerializeField] protected float currentHealth;
+    protected float currentHealth;
 
     public Tile OccupiedTile { get => occupiedTile; set => occupiedTile = value; }
     public float CurrentHealth { get => currentHealth; set => currentHealth = value; }
@@ -30,13 +30,16 @@ public abstract class Entity : MonoBehaviour
     {
         var neighbourTiles = WorldGrid.Instance.GetNeighbourTiles(occupiedTile, 1);
 
-        if(entity is Sheep || entity is Wolf)
-            return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileIsOccupiedByAnimal(tile));
-
-        if(entity is Grass)
-            return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileHasGrass(tile));
-
-        Debug.LogWarning("There is no free tile nearby");
-        return null;
+        switch (entity)
+        {
+            case Sheep _:
+            case Wolf _:
+                return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileIsOccupiedByAnimal(tile));
+            case Grass _:
+                return neighbourTiles.FirstOrDefault(tile => !Tile.CheckIfTileHasGrass(tile));
+            default:
+                Debug.LogWarning("There is no free tile nearby");
+                return null;
+        }
     }
 }

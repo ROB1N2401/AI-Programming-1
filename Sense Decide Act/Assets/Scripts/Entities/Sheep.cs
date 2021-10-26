@@ -74,7 +74,7 @@ public class Sheep : Animal
     }
 
     #region FSM
-    void Update()
+    private void Update()
     {
         occupiedTile = WorldGrid.Instance.WorldToTilePoint(transform.position);
         currentHealth -= SHEEP_HEALTH_DEPLETION_RATE * Time.deltaTime;
@@ -90,19 +90,26 @@ public class Sheep : Animal
             case AnimalState.Evading:
                 transform.Translate(_evadeDirection * (SHEEP_RUNNING_SPEED * Time.deltaTime));
                 break;
+
             case AnimalState.Eating:
                 Eat(occupiedTile.GrassComponent, SHEEP_EATING_RATE, SHEEP_WALKING_SPEED);
                 break;
+
             case AnimalState.Breeding:
                 Breed(SHEEP_MAX_HEALTH);
                 Decide();
                 break;
+
             case AnimalState.Pursuing:
                 MoveTowards(_grassToEat, SHEEP_WALKING_SPEED);
                 break;
+
             case AnimalState.Wandering:
                 MoveTowards(tileToWander, SHEEP_WALKING_SPEED);
                 break;
+
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
     #endregion

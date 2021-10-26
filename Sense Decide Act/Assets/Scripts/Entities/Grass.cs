@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Grass : Entity
 {
@@ -16,14 +18,12 @@ public class Grass : Entity
     private const int SPREADING_CHANCE = 30; //chance to spawn a grass tile each second
     private const int GRASS_HEALTH_DEPLETION_RATE = GRASS_MAX_HEALTH / 10;
 
-
     private SpriteRenderer _spriteRenderer;
     private State _state;
     private float _maturityTimeElapsed;
     private bool _isTrampled;
     private bool _isEaten;
     private bool _hasReachedMaturity;
-
 
     private void Awake()
     {
@@ -83,7 +83,7 @@ public class Grass : Entity
         switch (_state)
         {
             case State.Growing:
-                Grow();
+                currentHealth += GRASS_HEALTH_DEPLETION_RATE * Time.deltaTime;
                 break;
 
             case State.Spreading:
@@ -91,22 +91,15 @@ public class Grass : Entity
                 break;
 
             case State.Withering:
-                Wither();
+                currentHealth -= GRASS_HEALTH_DEPLETION_RATE * Time.deltaTime;
                 break;
 
             case State.Trampled:
                 break;
-        }
-    }
-    
-    private void Grow()
-    {
-        currentHealth += GRASS_HEALTH_DEPLETION_RATE * Time.deltaTime;
-    }
 
-    private void Wither()
-    {
-        currentHealth -= GRASS_HEALTH_DEPLETION_RATE * Time.deltaTime;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     private void Spread()
@@ -152,8 +145,6 @@ public class Grass : Entity
     public static void Instantiate(Tile tile)
     {
         var grass = tile.GetComponent<Grass>();
-
-        //Debug.Log($"{tile.name} has ID {tile.GetInstanceID()}, {tile.gameObject.GetInstanceID()}");
 
         tile.SetGrassComponentState(true);
         if(!Main.Instance.EntityCollection.ContainsKey(grass.transform.gameObject.GetInstanceID()))

@@ -1,3 +1,4 @@
+using Support;
 using UnityEngine;
 
 public enum AnimalState
@@ -48,6 +49,7 @@ public abstract class Animal : Entity
     {
         if(tile == null)
             return;
+
         transform.position = Vector3.MoveTowards(transform.position, tile.WorldPos, speed * Time.deltaTime);
     }
 
@@ -55,13 +57,8 @@ public abstract class Animal : Entity
     {
         if(entity == null)
             return;
-        transform.position = Vector3.MoveTowards(transform.position, entity.transform.position, speed * Time.deltaTime);
-    }
 
-    protected override void UpdateHealthColor(int maxHealth)
-    {
-        var healthLeft = currentHealth / maxHealth;
-        healthSprite.color = new Color(1f - healthLeft, healthLeft, 0f);
+        transform.position = Vector3.MoveTowards(transform.position, entity.transform.position, speed * Time.deltaTime);
     }
 
     protected void UpdateStateColor()
@@ -115,6 +112,12 @@ public abstract class Animal : Entity
         var newAnimal = (Animal)Main.Instantiate(entityType);
         newAnimal.SetAnimalsPosition(GetNearestFreeTile(this));
         newAnimal.currentHealth = startingHealth;
+    }
+
+    protected override void UpdateHealthColor(int maxHealth)
+    {
+        var healthLeft = currentHealth / maxHealth;
+        healthSprite.color = new Color(1f - healthLeft, healthLeft, 0f);
     }
 
     protected override void Die()

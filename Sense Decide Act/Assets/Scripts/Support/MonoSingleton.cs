@@ -1,10 +1,8 @@
-//Written by my friend and collaborator, imported here from his permission
-
-//using Extensions;
 using UnityEngine;
 
 namespace Support
 {
+    //Written by my friend and collaborator, imported here from his permission
     public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         public static T Instance { get; private set; }
@@ -13,7 +11,6 @@ namespace Support
         {
             if (Instance != null && Instance != this)
             {
-                //this.SafeDebug($"There is more than one singleton of type {typeof(T)} in the scene", LogType.Warning);
                 Debug.LogError($"There is more than one singleton of type {typeof(T)} in the scene");
 
                 Destroy(this);

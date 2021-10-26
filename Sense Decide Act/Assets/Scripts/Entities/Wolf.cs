@@ -1,6 +1,7 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Wolf : Animal
 {
@@ -45,7 +46,8 @@ public class Wolf : Animal
         if (_targetedSheep != null && occupiedTile == _targetedSheep.OccupiedTile)
             state = AnimalState.Eating;
 
-        else if(state is AnimalState.Pursuing && _targetedSheep != null) //Wolf will ignore everything until he hunts down the sheep he decided to hunt
+        //Wolf will ignore everything until he hunts down the sheep he decided to hunt
+        else if(state is AnimalState.Pursuing && _targetedSheep != null)
             return;
 
         else if (isReadyToBreed)
@@ -65,7 +67,7 @@ public class Wolf : Animal
     }
 
     #region FSM
-    void Update()
+    private void Update()
     {
         occupiedTile = WorldGrid.Instance.WorldToTilePoint(transform.position);
         currentHealth -= WOLF_HEALTH_DEPLETION_RATE * Time.deltaTime;
@@ -81,16 +83,25 @@ public class Wolf : Animal
             case AnimalState.Eating:
                 Eat(_targetedSheep, WOLF_EATING_RATE, WOLF_RUNNING_SPEED);
                 break;
+
             case AnimalState.Breeding:
                 Breed(WOLF_MAX_HEALTH);
                 Decide();
                 break;
+
             case AnimalState.Pursuing:
                 MoveTowards(_targetedSheep, WOLF_RUNNING_SPEED);
                 break;
+
             case AnimalState.Wandering:
                 MoveTowards(tileToWander, WOLF_WALKING_SPEED);
                 break;
+
+            case AnimalState.Evading:
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
     #endregion
@@ -116,27 +127,5 @@ public class Wolf : Animal
         _sheepSeen = GetSheepInRadius(2);
         return _sheepSeen.Count == 0 ? null : _sheepSeen[Random.Range(0, _sheepSeen.Count)];
 
-    }
-
-    private Sheep GetNearestSheepToPursue()
-    {
-        _sheepSeen = GetSheepInRadius(2);
-        if (_sheepSeen.Count == 0)
-            return null;
-
-        Sheep sheepToReturn = null;
-        var shortestDistance = 10000.0f;
-
-        foreach (var sheep in _sheepSeen)
-        {
-            var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - sheep.transform.position));
-
-            if (distance > shortestDistance) continue;
-
-            shortestDistance = distance;
-            sheepToReturn = sheep;
-        }
-
-        return sheepToReturn;
     }
 }
