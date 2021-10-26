@@ -7,7 +7,7 @@ public class Wolf : Animal
     public const int WOLF_MAX_HEALTH = 150;
 
     private const int WOLF_EATING_RATE = Sheep.SHEEP_MAX_HEALTH / 2;
-    private const int WOLF_WALKING_SPEED = 15;
+    private const int WOLF_WALKING_SPEED = 14;
     private const int WOLF_RUNNING_SPEED = WOLF_WALKING_SPEED * 2;
     private const int WOLF_HEALTH_DEPLETION_RATE = WOLF_MAX_HEALTH / 20;
 
@@ -35,6 +35,8 @@ public class Wolf : Animal
 
     public override void Decide()
     {
+        var wasBreeding = state is AnimalState.Breeding;
+
         isReadyToBreed = (currentHealth > WOLF_MAX_HEALTH * BREEDING_COEFFICIENT);
         isHungry = (currentHealth < WOLF_MAX_HEALTH * HUNGER_COEFFICIENT);
         if (occupiedTile == tileToWander)
@@ -58,8 +60,8 @@ public class Wolf : Animal
         else
             state = AnimalState.Wandering;
         
-
-        UpdateStateColor();
+        if(!wasBreeding)
+            UpdateStateColor();
     }
 
     #region FSM

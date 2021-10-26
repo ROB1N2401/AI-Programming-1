@@ -5,32 +5,27 @@ using UnityEngine;
 public class WorldGrid : MonoSingleton<WorldGrid>
 {
     public const int WORLD_STEP = 5; //distance between each tile in world coordinate units
+    public const int GRID_SIZE_X = 10;
+    public const int GRID_SIZE_Y = 10;
+    public const int WORLD_BORDER_LEFT = 0;
+    public const int WORLD_BORDER_TOP = 0;
+    public const int WORLD_BORDER_RIGHT = (GRID_SIZE_X - 1) * WORLD_STEP;
+    public const int WORLD_BORDER_BOTTOM = -(GRID_SIZE_Y - 1) * WORLD_STEP;
 
     private const float GRASS_SPAWN_CHANCE = 0.8f;
 
     private Tile[,] _tileStorage;
-    private int _gridSizeX;
-    private int _gridSizeY;
     private Vector2 _gridWorldSize;
 
-    public int GridSizeX => _gridSizeX;
-    public int GridSizeY => _gridSizeY;
     public Tile[,] TileStorage => _tileStorage;
-
-    // Start is called before the first frame update
-    private void Start()
-    {
-        _gridSizeX = 10;
-        _gridSizeY = 10;
-    }
 
     public void CreateGrid()
     {
-        _tileStorage = new Tile[_gridSizeX, _gridSizeY];
+        _tileStorage = new Tile[GRID_SIZE_X, GRID_SIZE_Y];
 
-        for (var i = 0; i < _gridSizeX; i++)
+        for (var i = 0; i < GRID_SIZE_X; i++)
         {
-            for (var j = 0; j < _gridSizeY; j++)
+            for (var j = 0; j < GRID_SIZE_Y; j++)
             {
                 var pos = new Vector3(i * WORLD_STEP, -j * WORLD_STEP);
                 var go = Instantiate(Resources.Load("Tile", typeof(GameObject)), this.gameObject.transform) as GameObject;
@@ -49,7 +44,7 @@ public class WorldGrid : MonoSingleton<WorldGrid>
             }
         }
 
-        _gridWorldSize = TileStorage[_gridSizeX - 1, _gridSizeY - 1].WorldPos;
+        _gridWorldSize = TileStorage[GRID_SIZE_X - 1, GRID_SIZE_Y - 1].WorldPos;
     }
 
     public List<Tile> GetNeighbourTiles(Tile targetTile, ushort radius)
@@ -68,7 +63,7 @@ public class WorldGrid : MonoSingleton<WorldGrid>
                 var neighbourX = targetTile.GridPosX + x;
                 var neighbourY = targetTile.GridPosY + y;
 
-                if (neighbourX >= 0 && neighbourX < _gridSizeX && neighbourY >= 0 && neighbourY < _gridSizeY)
+                if (neighbourX >= 0 && neighbourX < GRID_SIZE_X && neighbourY >= 0 && neighbourY < GRID_SIZE_Y)
                 {
                     neighbourTiles.Add(TileStorage[neighbourX, neighbourY]);
                 }
@@ -86,16 +81,16 @@ public class WorldGrid : MonoSingleton<WorldGrid>
         percentX = Mathf.Clamp01(percentX);
         percentY = Mathf.Clamp01(percentY);
 
-        var x = Mathf.RoundToInt((_gridSizeX - 1) * percentX);
-        var y = Mathf.RoundToInt((_gridSizeY - 1) * percentY);
+        var x = Mathf.RoundToInt((GRID_SIZE_X - 1) * percentX);
+        var y = Mathf.RoundToInt((GRID_SIZE_Y - 1) * percentY);
 
         return _tileStorage[x, y];
     }
 
     public Tile GetRandomTile()
     {
-        var x = Random.Range(0, _gridSizeX);
-        var y = Random.Range(0, _gridSizeY);
+        var x = Random.Range(0, GRID_SIZE_X);
+        var y = Random.Range(0, GRID_SIZE_Y);
 
         return _tileStorage[x, y];
     }

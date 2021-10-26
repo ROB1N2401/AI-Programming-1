@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public enum AnimalState
@@ -24,7 +22,7 @@ public abstract class Animal : Entity
     protected SpriteRenderer healthSprite;
 
     public AnimalState State => state;
-    public bool Ishungry => isHungry;
+    public bool IsHungry => isHungry;
 
     protected void Start()
     {
@@ -35,14 +33,14 @@ public abstract class Animal : Entity
     private void SetAnimalsPosition(Tile tile)
     {
         occupiedTile = tile;
-        this.transform.position = occupiedTile.transform.position;
+        transform.position = occupiedTile.transform.position;
     }
 
     protected void ClampPosition()
     {
         var position = transform.position;
-        var x = Mathf.Clamp(position.x, 0.0f, (WorldGrid.Instance.GridSizeX - 1) * WorldGrid.WORLD_STEP);
-        var y = Mathf.Clamp(position.y, -(WorldGrid.Instance.GridSizeY - 1) * WorldGrid.WORLD_STEP, 0.0f);
+        var x = Mathf.Clamp(position.x, WorldGrid.WORLD_BORDER_LEFT, WorldGrid.WORLD_BORDER_RIGHT);
+        var y = Mathf.Clamp(position.y, WorldGrid.WORLD_BORDER_BOTTOM, WorldGrid.WORLD_BORDER_TOP);
         transform.position = new Vector3(x, y, position.z);
     }
 
@@ -111,7 +109,7 @@ public abstract class Animal : Entity
 
     protected void Breed(int maxHealth)
     {
-        float startingHealth = maxHealth * Random.Range(MIN_STARTING_HEALTH_COEFFICIENT, MAX_STARTING_HEALTH_COEFFICIENT);
+        var startingHealth = maxHealth * Random.Range(MIN_STARTING_HEALTH_COEFFICIENT, MAX_STARTING_HEALTH_COEFFICIENT);
         currentHealth -= startingHealth;
 
         var newAnimal = (Animal)Main.Instantiate(entityType);
@@ -127,8 +125,8 @@ public abstract class Animal : Entity
 
     public void PlaceAnimalOnRandomTile()
     {
-        var x = WorldGrid.Instance.GridSizeX - 1;
-        var y = WorldGrid.Instance.GridSizeY - 1;
+        const int x = WorldGrid.GRID_SIZE_X - 1;
+        const int y = WorldGrid.GRID_SIZE_Y - 1;
 
         while (true)
         {

@@ -52,17 +52,16 @@ public class Main : MonoSingleton<Main>
 
     public static List<T> GetEntitiesOfType<T>()
     {
-        var entites = new List<T>();
+        var entities = new List<T>();
 
         foreach (var entity in Instance.EntityCollection)
         {
             if(entity.Value is T t)
-                entites.Add(t);
+                entities.Add(t);
         }
 
-        return entites;
+        return entities;
     }
-
 
     public static Entity Instantiate(EntityType entityTypeIn)
     {
@@ -73,7 +72,7 @@ public class Main : MonoSingleton<Main>
             return null;
         }
 
-        go.name = entityTypeIn + " ";
+        go.name = entityTypeIn.ToString();
         var entityComponent = go.GetComponent<Entity>();
         Instance.EntityCollection.Add(go.GetInstanceID(), entityComponent);
 

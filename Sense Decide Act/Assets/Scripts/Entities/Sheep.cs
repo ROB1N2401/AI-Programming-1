@@ -8,7 +8,7 @@ public class Sheep : Animal
     public const int SHEEP_MAX_HEALTH = 90;
 
     private const int SHEEP_EATING_RATE = Grass.GRASS_MAX_HEALTH / 1;
-    private const int SHEEP_WALKING_SPEED = 10;
+    private const int SHEEP_WALKING_SPEED = 11;
     private const int SHEEP_RUNNING_SPEED = SHEEP_WALKING_SPEED * 2;
     private const int SHEEP_HEALTH_DEPLETION_RATE = SHEEP_MAX_HEALTH / 15;
 
@@ -41,6 +41,8 @@ public class Sheep : Animal
 
     public override void Decide()
     {
+        var wasBreeding = state is AnimalState.Breeding;
+
         isReadyToBreed = (currentHealth > SHEEP_MAX_HEALTH * BREEDING_COEFFICIENT);
         isHungry = (currentHealth < SHEEP_MAX_HEALTH * HUNGER_COEFFICIENT);
         if (occupiedTile == tileToWander)
@@ -67,8 +69,8 @@ public class Sheep : Animal
         else
             state = AnimalState.Wandering;
         
-
-        UpdateStateColor();
+        if(!wasBreeding)
+            UpdateStateColor();
     }
 
     #region FSM
@@ -136,7 +138,7 @@ public class Sheep : Animal
         foreach (var wolf in allWolves)
         {
             var distance = Mathf.Abs(Vector3.Magnitude(this.transform.position - wolf.transform.position));
-            if (tileRadius * WorldGrid.WORLD_STEP < distance || !wolf.Ishungry) continue;
+            if (tileRadius * WorldGrid.WORLD_STEP < distance || !wolf.IsHungry) continue;
 
             wolvesNearby.Add(wolf);
         }
@@ -144,19 +146,37 @@ public class Sheep : Animal
         return wolvesNearby;
     }
 
-    /// <returns>a normalized vector that is sum of all wolves' positions</returns>
+    private Vector2 GetDirectionFromWorldBorders()
+    {
+        var vectorToReturn = Vector2.zero;
+
+        if(Math.Abs(transform.position.x - WorldGrid.WORLD_BORDER_LEFT) < WorldGrid.WORLD_STEP)
+            vectorToReturn += Vector2.right;
+        if(Math.Abs(transform.position.x - WorldGrid.WORLD_BORDER_RIGHT) < WorldGrid.WORLD_STEP)
+            vectorToReturn += Vector2.left;
+        if(Math.Abs(transform.position.y - WorldGrid.WORLD_BORDER_TOP) < WorldGrid.WORLD_STEP)
+            vectorToReturn += Vector2.down;
+        if(Math.Abs(transform.position.y - WorldGrid.WORLD_BORDER_BOTTOM) < WorldGrid.WORLD_STEP)
+            vectorToReturn += Vector2.up;
+
+        return vectorToReturn.normalized;
+    }
+
+    ///<returns>A normalized vector that is sum of all wolves' positions and avoidance vectors</returns>
     private Vector2 GetDirectionToRun()
     {
         _hungryWolvesSeen = GetHungryWolvesInRadius(3);
         if(_hungryWolvesSeen.Count == 0)
             return Vector2.zero;
 
-        var vectorToReturn = Vector3.zero;
+        var vectorToReturn = Vector2.zero;
         foreach (var wolf in _hungryWolvesSeen)
         {
-            var vector = this.transform.position - wolf.transform.position;
-            vectorToReturn += vector;
+            var vector = (Vector2)(this.transform.position - wolf.transform.position);
+            vectorToReturn += vector.normalized;
         }
+
+        vectorToReturn += GetDirectionFromWorldBorders();
 
         return vectorToReturn.normalized;
     }

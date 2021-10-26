@@ -1,6 +1,4 @@
-﻿
-using System.Linq;
-using System.Net;
+﻿using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Grass))]
@@ -22,7 +20,6 @@ public class Tile : MonoBehaviour
         _grassComponent.enabled = false;
     }
 
-    //Method carries a role of constructor, hence it's positioned above other methods
     public void Initialize(bool hasGrass, Vector3 worldPos, int gridPosX, int gridPosY)
     {
         _worldPos = worldPos;
@@ -34,11 +31,6 @@ public class Tile : MonoBehaviour
         UpdateColor();
     }
 
-    /// <summary>
-    /// Checks whether the tile is occupied or not
-    /// </summary>
-    /// <param name="tile">tile to check</param>
-    /// <returns>true if tile is occupied by a single entity</returns>
     public static bool CheckIfTileIsOccupiedByAnimal(Tile tile)
     {
         var sheepList = Main.GetEntitiesOfType<Sheep>();
