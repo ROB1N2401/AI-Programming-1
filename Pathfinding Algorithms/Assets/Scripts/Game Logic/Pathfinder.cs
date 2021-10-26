@@ -75,7 +75,7 @@ public class Pathfinder
             }
         }
 
-        Main.Instance.simulationIsRunning = false;
+        Main.Instance.StopSimulation();
         Main.Instance.Entities["Starchaser"].StopAllCoroutines();
         Debug.LogWarning("path between two tiles could not be found");
         return null;

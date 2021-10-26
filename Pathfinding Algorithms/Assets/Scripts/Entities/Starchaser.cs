@@ -15,7 +15,6 @@ public class Starchaser : Entity
     private LineRenderer _lr;
     private EntityType _goingTo;
 
-    // Start is called before the first frame update
     private void Start()
     {
         _hasStar = false;
@@ -53,7 +52,6 @@ public class Starchaser : Entity
 
             yield return new WaitForSeconds(STEP_PERIOD);
         }
-        // ReSharper disable once IteratorNeverReturns
     }
 
     private void FindStar()

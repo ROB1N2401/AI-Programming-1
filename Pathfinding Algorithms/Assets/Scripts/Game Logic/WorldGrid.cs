@@ -14,7 +14,6 @@ public class WorldGrid : MonoSingleton<WorldGrid>
     public int GridSizeY => _gridSizeY;
     public Tile[,] TileStorage => _tileStorage;
 
-    // Start is called before the first frame update
     private void Start()
     {
         _blockedTileSpawnChance = 0.4f;
@@ -32,15 +31,16 @@ public class WorldGrid : MonoSingleton<WorldGrid>
             {
                 var pos = new Vector3(i * 5, -j * 5);
                 var go = Instantiate(Resources.Load("Tile", typeof(GameObject)), this.gameObject.transform) as GameObject;
-                if (go is null) 
-                    Debug.LogError("Failed to linitialize a tile");
-                else
+                if (go is null)
                 {
-                    go.transform.position = pos;
-                    var tile = go.GetComponent<Tile>();
-                    tile.Initialize((Random.Range(0f, 1f) >= _blockedTileSpawnChance), pos, i, j);
-                    TileStorage[i, j] = tile;
+                    Debug.LogError("Failed to initialize a tile");
+                    return;
                 }
+
+                go.transform.position = pos;
+                var tile = go.GetComponent<Tile>();
+                tile.Initialize((Random.Range(0f, 1f) >= _blockedTileSpawnChance), pos, i, j);
+                TileStorage[i, j] = tile;
             }
         }
 
