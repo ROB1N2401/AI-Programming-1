@@ -9,7 +9,7 @@ to continue the simulation.
 Symbols:
 	-Starchaser is visualised by dynamically coloured circle;
 	-Star is visualised by yellow star;
-	-Trading Post is visualised by cyan romb;
+	-Trading Post is visualised by cyan rhomb;
 	-Spaceship is visualised by green plus shape;
 	-Unwalkable tiles are coloured grey, walkable - white;
 
